@@ -9,6 +9,8 @@ Adds additional maps to Strava.com:
  - [mapy.cz](https://mapy.cz/)
  - [OpenTopoMap.org](https://opentopomap.org/)
 
+ ![Image](../master/sshot.png?raw=true)
+ 
 ## Installation
 
  - [Chrome Web Store](https://chrome.google.com/webstore/detail/mapissimo/pepbnlfbmhnpgaoojfoclhbkbefbnkag)
