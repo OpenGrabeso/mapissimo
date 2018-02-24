@@ -22,32 +22,13 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 	}
 
 	function addLayers(map) {
-		map.layers.runbikehike = map.createLayer("run-bike-hike");
 		AdditionalMapLayers.forEach(l => map.layers[l.type] = tileLayer(l));
-		if (window.google) {
-			window.google.load("maps", "3.9", {"other_params":"sensor=false&libraries=geometry,places&client=gme-stravainc1", callback: function(){
-				//'https://cdn.rawgit.com/shramov/leaflet-plugins/master/layer/tile/Google.js'
-				jQuery.getScript(FixScript.dataset.googleJsUrl).done(function() {
-					map.layers.googlesatellite = new L.Google('SATELLITE');
-					map.layers.googleroadmap = new L.Google('ROADMAP');
-					map.layers.googlehybrid = new L.Google('HYBRID');
-					map.layers.googleterrain = new L.Google('TERRAIN');
-				});
-			}});
-		}
 	}
-
-	Strava.Maps.Mapbox.Base.mapIds.runbikehike_id = "mapbox.run-bike-hike";
 
 	var layerNames =
 		{terrain: Strava.I18n.Locale.t("strava.maps.google.custom_control.terrain")
 		,standard: Strava.I18n.Locale.t("strava.maps.google.custom_control.standard")
 		,satellite: Strava.I18n.Locale.t("strava.maps.google.custom_control.satellite")
-		,runbikehike: "Run/Bike/Hike"
-		,googlesatellite: "Google Satellite"
-		,googleroadmap: "Google Road Map"
-		,googlehybrid: "Google Hybrid"
-		,googleterrain: "Google Terrain"
 		};
 	AdditionalMapLayers.forEach(l => layerNames[l.type] = l.name);
 
@@ -85,14 +66,7 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 		};
 
 		var optsToAdd = [];
-		optsToAdd.push(
-			{type: "runbikehike", name: "Run/Bike/Hike"});
 		AdditionalMapLayers.forEach(l => optsToAdd.push({type: l.type, name: l.name}));
-		optsToAdd.push(
-			{type: "googlesatellite", name: "Google Satellite"},
-			{type: "googleroadmap", name: "Google Road Map"},
-			{type: "googlehybrid", name: "Google Hybrid"},
-			{type: "googleterrain", name: "Google Terrain"});
 		optsToAdd.forEach(o => activityOpts.append(jQuery('<li>').append(jQuery('<a class="map-type-selector">').data("map-type-id", o.type).text(o.name))));
 
 		var preferredMap = localStorage.stravaMapSwitcherPreferred;
@@ -139,12 +113,7 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 			addButton("Standard", "standard");
 			addButton("Terrain", "terrain");
 			addButton("Satellite", "satellite");
-			addButton("Run/Bike/Hike", "runbikehike");
 			AdditionalMapLayers.forEach(l => addButton(l.name, l.type));
-			addButton("Google Satellite", "googlesatellite");
-			addButton("Google Road Map", "googleroadmap");
-			addButton("Google Hybrid", "googlehybrid");
-			addButton("Google Terrain", "googleterrain");
 
 			var preferredMap = localStorage.stravaMapSwitcherPreferred;
 			if (preferredMap) {
