@@ -14,8 +14,10 @@ var AdditionalMapLayers = (function(){
 	var osmAttr = '&copy; <a href="http://openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
 	var thunderforestAttr = osmAttr + ', Tiles courtesy of <a href="http://www.thunderforest.com/" target="_blank">Andy Allan</a>';
 	var mtbMapAttr = osmAttr + ', Tiles courtesy of <a href="http://mtbmap.cz/" target="_blank">mtbmap.cz</a>';
-	var mapyCzAttr = '&copy; <a href="https://www.seznam.cz/" target="_blank">Seznam.cz, a.s</a>, ' + osmAttr;
-	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">mtbmap.cz</a>';
+	var osmCzAttr = ', Tiles courtesy of <a href="https://openstreetmap.cz" target="_blank">openstreetmap.cz</a>';
+	var mapyCzOnlyAttr = '&copy; <a href="https://www.seznam.cz/" target="_blank">Seznam.cz, a.s</a>';
+	var mapyCzAttr = mapyCzOnlyAttr + ', ' + osmAttr;
+	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">OpenTopoMap.org</a>';
 	return [
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -35,8 +37,17 @@ var AdditionalMapLayers = (function(){
 			overlay:
 				{url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
 					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzAttr}}},
-		{type: "opentopo", name: "OpenTopo",
+		{type: "opentopo", name: "OpenTopo (+Mapy.cz)",
 			url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: openTopoAttr}},
+			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
+			overlay:
+				{url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
+					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzOnlyAttr}}},
+		{type: "opentopocz", name: "OpenTopo (+OSM.cz)",
+			url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
+			overlay:
+				{url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
+					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}}},
 	];
 })();
