@@ -18,7 +18,12 @@ var AdditionalMapLayers = (function(){
 	var mapyCzOnlyAttr = '&copy; <a href="https://www.seznam.cz/" target="_blank">Seznam.cz, a.s</a>';
 	var mapyCzAttr = mapyCzOnlyAttr + ', ' + osmAttr;
 	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">OpenTopoMap.org</a>';
+    var mapboxAttr = osmAttr + ', Tiles courtesy of <a href="https://www.mapbox.com" target="_blank">Mapbox.com</a>';
 	return [
+        {type: "tracks", name: "Tracks",
+            url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr}
+        },
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			opts: {maxZoom: 20, maxNativeZoom: 19, attribution: osmAttr}},
