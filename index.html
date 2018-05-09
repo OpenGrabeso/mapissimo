@@ -13,6 +13,7 @@
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="demo.css"/>
   <script src="extension/layers.js"></script>
+  <script src="lib/leaflet.restoreview.js"></script>
 
 </head>
 <body>
@@ -22,7 +23,11 @@
 <div id="mapid"></div>
 <script>
 
-    var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+    var mymap = L.map('mapid')
+
+    if (!mymap.restoreView()) {
+        mymap.setView([50, 10], 6);
+    }
 
     function tileLayer(l) {
         var r = L.tileLayer(l.url, l.opts);
