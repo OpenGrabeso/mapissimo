@@ -8,8 +8,10 @@ Adds additional maps to Strava.com:
  - [mtbmap.cz](http://mtbmap.cz/)
  - [mapy.cz](https://mapy.cz/)
  - [OpenTopoMap.org](https://opentopomap.org/)
+ - [Tracks - MapBox with a custom style](https://mapbox.com)
 
- ![Image](../master/sshot.png?raw=true)
+ ![Image](../master/web-store/sshot.png?raw=true)
+ ![Image](../master/web-store/tracks-sshot.png?raw=true)
  
 ## Installation
 
