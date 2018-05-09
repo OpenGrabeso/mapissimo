@@ -31,7 +31,6 @@
 			var s = document.createElement("script");
 			s.src = getURL('fix.js');
 			s.type = 'text/javascript';
-			s.dataset.googleJsUrl = getURL('Google.js');
 			s.dataset.layersUrl = getURL('layers.js');
 			document.body.appendChild(s);
 		});
