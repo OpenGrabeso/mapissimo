@@ -12,6 +12,10 @@ Adds additional maps to Strava.com:
 
  ![Image](../master/web-store/sshot.png?raw=true)
  ![Image](../master/web-store/tracks-sshot.png?raw=true)
+
+## Live demo
+
+ [Live demo - GitHub pages](https://opengrabeso.github.io/mapissimo/)
  
 ## Installation
 
