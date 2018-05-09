@@ -1,0 +1,26 @@
+body, html {
+    margin: 0; padding: 0;
+    background-color: #fdfdfd;
+    color: #424242;
+    background-repeat: no-repeat;
+    background-size: cover; /* I'm gonna have a blurred background image */
+}
+.page-content {
+    min-height: 300px; width: 600px; height: auto;
+    margin: 60px auto 30px auto;
+    background-color: blue;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#mapid {
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+}
