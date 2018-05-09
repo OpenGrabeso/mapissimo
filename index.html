@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="demo.css"/>
   <script src="extension/layers.js"></script>
   <script src="lib/leaflet.restoreview.js"></script>
+  <script src="lib/Leaflet.Grid.js"></script>
 
 </head>
 <body>
@@ -43,7 +44,9 @@
         var r = L.tileLayer(l.url, l.opts);
         if (l.overlay) {
             var o = L.tileLayer(l.overlay.url, l.overlay.opts);
-            r = L.layerGroup([r, o]);
+            r = L.layerGroup([r, o, L.grid()]);
+        } else {
+            r = L.layerGroup([r, L.grid()]);
         }
         return r;
     }
