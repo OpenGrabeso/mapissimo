@@ -36,7 +36,7 @@
         return baseMaps;
     }
 
-    var mymap = L.map('mapid');
+    var mymap = L.map('mapid', {preferCanvas: true});
 
     if (!mymap.restoreView()) {
         mymap.setView([50, 10], 6);
@@ -59,8 +59,6 @@
     baseMaps[AdditionalMapLayers[0].name].addTo(mymap);
 
 </script>
-
-<div id="images"></div>
 
 </body>
 </html>

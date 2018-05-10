@@ -30,11 +30,14 @@ html, body {
     border-bottom: 1px solid #ccc;
     width: 26px;
     height: 26px;
-    line-height: 26px;
     display: block;
     text-align: center;
     text-decoration: none;
     color: black;
     padding-top: 0.3em;
     font: bold 12px/20px Tahoma, Verdana, sans-serif;
+}
+
+.image_output {
+    border: #0000ff 2px solid;
 }
