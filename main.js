@@ -53,9 +53,8 @@ function createOutput(pos) {
     }
 }
 
-
-var a4width = 1654;
-var a4height = 2339;
+var a4width = 2480;
+var a4height = 3508;
 
 L.Control.Save = L.Control.extend(createButton("bottomleft", "Save..."));
 L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", {x: a4height, y: a4width}));
