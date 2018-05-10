@@ -13,11 +13,17 @@
 var FixScript = document.currentScript;
 jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 	function tileLayer(l) {
-		var r = L.tileLayer(l.url, l.opts);
-		if (l.overlay) {
-			var o = L.tileLayer(l.overlay.url, l.overlay.opts);
-			r = L.layerGroup([r, o]);
-		}
+        var r = L.tileLayer(l.url, l.opts);
+        if (l.overlay) {
+            var o = L.tileLayer(l.overlay.url, l.overlay.opts);
+            if (l.grid) {
+                r = L.layerGroup([r, o, L.grid()]);
+            } else {
+                r = L.layerGroup([r, o]);
+			}
+        } else if (l.grid) {
+            r = L.layerGroup([r, L.grid()]);
+        }
 		return r;
 	}
 

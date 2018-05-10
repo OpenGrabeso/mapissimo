@@ -12,7 +12,6 @@
 
 var AdditionalMapLayers = (function(){
 	var osmAttr = '&copy; <a href="http://openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
-	var thunderforestAttr = osmAttr + ', Tiles courtesy of <a href="http://www.thunderforest.com/" target="_blank">Andy Allan</a>';
 	var mtbMapAttr = osmAttr + ', Tiles courtesy of <a href="http://mtbmap.cz/" target="_blank">mtbmap.cz</a>';
 	var osmCzAttr = ', Tiles courtesy of <a href="https://openstreetmap.cz" target="_blank">openstreetmap.cz</a>';
 	var mapyCzOnlyAttr = '&copy; <a href="https://www.seznam.cz/" target="_blank">Seznam.cz, a.s</a>';
@@ -23,6 +22,7 @@ var AdditionalMapLayers = (function(){
         {type: "tracks", name: "Tracks (+Mapy.cz)",
             url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
+			grid: true,
             overlay:
                 {url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
                     opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzOnlyAttr}
@@ -46,12 +46,14 @@ var AdditionalMapLayers = (function(){
 		{type: "opentopo", name: "OpenTopo (+Mapy.cz)",
 			url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
 			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
+            grid: true,
 			overlay:
 				{url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
 					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzOnlyAttr}}},
 		{type: "opentopocz", name: "OpenTopo (+OSM.cz)",
 			url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
 			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
+            grid: true,
 			overlay:
 				{url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
 					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}}},
