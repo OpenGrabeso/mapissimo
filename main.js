@@ -2,11 +2,12 @@
  * Export map bitmap (into images DOM)
  */
 
-var leafletImage = require('leaflet-image');
+//var leafletImage = require('./lib/leaflet.image.js');
+var leafletImage = require('../leaflet-image-custom/index.js');
 
 var imageDiv;
 
-function createButton(pos, name, dimX, dimY) {
+function createButton(pos, name, dim) {
     return {
         options: {
             position: pos
@@ -21,14 +22,14 @@ function createButton(pos, name, dimX, dimY) {
                 leafletImage(mymap, function(err, canvas) {
                     // now you have canvas
                     var img = document.createElement('img');
-                    var dimensions = mymap.getSize();
+                    var dimensions = dim || mymap.getSize();
                     img.width = dimensions.x / 10;
                     img.height = dimensions.y / 10;
                     img.className = "image_output";
                     img.src = canvas.toDataURL();
                     imageDiv.innerHTML = '';
                     imageDiv.appendChild(img);
-                });
+                }, dim);
             };
             return container;
         }
@@ -57,8 +58,9 @@ var a4width = 1654;
 var a4height = 2339;
 
 L.Control.Save = L.Control.extend(createButton("bottomleft", "Save..."));
-L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", a4width, a4height ));
-L.Control.SavePortrait = L.Control.extend(createButton("bottomleft", "A4 Portrait", a4height, a4width));
+L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", {x: a4height, y: a4width}));
+// noinspection JSSuspiciousNameCombination
+L.Control.SavePortrait = L.Control.extend(createButton("bottomleft", "A4 Portrait", {x: a4width, y: a4height}));
 L.Control.Output = L.Control.extend(createOutput("bottomleft"));
 
 L.Map.mergeOptions({
@@ -76,3 +78,6 @@ L.Map.addInitHook(function () {
         this.addControl(new L.Control.Output());
     }
 });
+
+
+
