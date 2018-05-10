@@ -127,9 +127,11 @@ L.Grid = L.LayerGroup.extend({
                 lines.push(i);
             }
         }
+        var aScale = 15;
+        var a = ( maxLines / aScale) / (delta / ticks);
         return {
             lines: lines,
-            alpha: Math.min(1, ( maxLines / 6) / (delta / ticks) )
+            alpha: Math.min(1, Math.sqrt(a))
         };
     },
 
