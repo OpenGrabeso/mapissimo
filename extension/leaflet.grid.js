@@ -18,7 +18,13 @@ L.Grid = L.LayerGroup.extend({
         redraw: 'move'
     },
 
-    fixedPoint: [0, 0], // lat, lng
+    _lineStyle: function(alpha) {
+        var ret = jQuery.extend({}, this.options.lineStyle);
+        ret.opacity *= alpha;
+        return ret;
+    },
+
+    _fixedPoint: [0, 0], // lat, lng
 
     initialize: function (options) {
         L.LayerGroup.prototype.initialize.call(this);
@@ -62,26 +68,27 @@ L.Grid = L.LayerGroup.extend({
 
         var size = this._map.getSize();
         var minSize = Math.max(size.x, size.y);
-        var minLineDistance = 20;
+        var minLineDistance = 10;
         var maxLines = minSize / minLineDistance;
 
         var latLines = this._latLines(grid_step_y, maxLines);
         var lngLines = this._lngLines(grid_step_x, maxLines);
+        var alpha = Math.min(latLines.alpha, lngLines.alpha);
 
         this.eachLayer(this.removeLayer, this);
 
-        if (latLines.length > 0 && lngLines.length > 0) {
+        if (latLines.lines.length > 0 && lngLines.lines.length > 0) {
             var grid = [];
             var i;
-            for (i in latLines) {
+            for (i in latLines.lines) {
                 if (Math.abs(latLines[i]) > 90) {
                     continue;
                 }
-                grid.push(this._horizontalLine(latLines[i]));
+                grid.push(this._horizontalLine(latLines.lines[i], alpha));
             }
 
-            for (i in lngLines) {
-                grid.push(this._verticalLine(lngLines[i]));
+            for (i in lngLines.lines) {
+                grid.push(this._verticalLine(lngLines.lines[i], alpha));
             }
 
             for (i in grid) {
@@ -109,9 +116,9 @@ L.Grid = L.LayerGroup.extend({
     _lines: function (low, high, ticks, maxLines, baseIndex) {
         var delta = high - low;
 
-        var lowAligned = Math.floor((low - this.fixedPoint[baseIndex])/ ticks) * ticks + this.fixedPoint[baseIndex];
+        var lowAligned = Math.floor((low - this._fixedPoint[baseIndex])/ ticks) * ticks + this._fixedPoint[baseIndex];
 
-        this.fixedPoint[baseIndex] = Math.floor(((low + high) / 2 - this.fixedPoint[baseIndex])/ ticks) * ticks + this.fixedPoint[baseIndex];
+        this._fixedPoint[baseIndex] = Math.floor(((low + high) / 2 - this._fixedPoint[baseIndex])/ ticks) * ticks + this._fixedPoint[baseIndex];
 
         var lines = [];
 
@@ -120,20 +127,23 @@ L.Grid = L.LayerGroup.extend({
                 lines.push(i);
             }
         }
-        return lines;
+        return {
+            lines: lines,
+            alpha: Math.min(1, ( maxLines / 6) / (delta / ticks) )
+        };
     },
 
-    _verticalLine: function (lng) {
+    _verticalLine: function (lng, alpha) {
         return new L.Polyline([
             [this._bounds.getNorth(), lng],
             [this._bounds.getSouth(), lng]
-        ], this.options.lineStyle);
+        ], this._lineStyle(alpha));
     },
-    _horizontalLine: function (lat) {
+    _horizontalLine: function (lat, alpha) {
         return new L.Polyline([
             [lat, this._bounds.getWest()],
             [lat, this._bounds.getEast()]
-        ], this.options.lineStyle);
+        ], this._lineStyle(alpha));
     },
 
 });
