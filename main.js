@@ -1,6 +1,8 @@
 /*
- * L.Control.ZoomDisplay shows the current map zoom level
+ * Export map bitmap (into images DOM)
  */
+
+var leafletImage = require('leaflet-image');
 
 L.Control.Export = L.Control.extend({
     options: {
@@ -13,7 +15,18 @@ L.Control.Export = L.Control.extend({
         container.type="button";
         container.value = "Save...";
         container.onclick = function() {
-            console.log("Save me ...");
+
+
+            leafletImage(mymap, function(err, canvas) {
+                // now you have canvas
+                var img = document.createElement('img');
+                var dimensions = mymap.getSize();
+                img.width = dimensions.x;
+                img.height = dimensions.y;
+                img.src = canvas.toDataURL();
+                document.getElementById('images').innerHTML = '';
+                document.getElementById('images').appendChild(img);
+            });
         };
         return container;
     },
@@ -34,3 +47,5 @@ L.Map.addInitHook(function () {
 L.control.exportControl = function (options) {
     return new L.Control.Export(options);
 };
+
+

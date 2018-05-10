@@ -1,0 +1,15 @@
+{
+  "name": "mapissimo",
+  "version": "0.9.9",
+  "dependencies": {
+    "leaflet-image": "0.4.0"
+  },
+  "devDependencies": {
+    "browserify": "~13.0.1",
+    "watchify": "~3.11.0"
+  },
+  "scripts": {
+    "make": "browserify main.js -o bundle.js",
+    "watch": "watchify main.js -o bundle.js -v"
+  }
+}
