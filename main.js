@@ -2,8 +2,9 @@
  * Export map bitmap (into images DOM)
  */
 
-//var leafletImage = require('./lib/leaflet.image.js');
-var leafletImage = require('../leaflet-image-custom/index.js');
+var leafletImage = require('leaflet-image');
+
+var cloneLayer = require('leaflet-clonelayer');
 
 var imageDiv;
 
@@ -14,17 +15,33 @@ function createButton(pos, name, dim) {
         },
 
         onAdd: function (map) {
-            this._map = map;
             var container = L.DomUtil.create('input');
             container.type = "button";
             container.value = name;
             container.onclick = function() {
-                leafletImage(mymap, function(err, canvas) {
+                if (dim) {
+                    var mapContainer = L.DomUtil.create('div', 'render-map');
+                    mapContainer.position = "absolute";
+                    mapContainer.style.width = dim.x + "px";
+                    mapContainer.style.height = dim.y + "px";
+                    imageDiv.innerHTML = '';
+                    imageDiv.appendChild(mapContainer);
+                    var renderMap = L.map(mapContainer, {
+                        attributionControl: false,
+                        zoomControl: false,
+                        scrollWheelZoom: false,
+                        exportControl: false
+                    });
+                    cloneLayer(baseMaps[AdditionalMapLayers[0].name]).addTo(renderMap);
+                    renderMap.setView(map.getCenter(), map.getZoom());
+                }
+                var aMap = dim ? renderMap : mymap;
+                leafletImage(aMap, function(err, canvas) {
                     // now you have canvas
                     var img = document.createElement('img');
-                    var dimensions = dim || mymap.getSize();
-                    img.width = dimensions.x / 10;
-                    img.height = dimensions.y / 10;
+                    var dimensions = aMap.getSize();
+                    img.width = dimensions.x / 4;
+                    img.height = dimensions.y / 4;
                     img.className = "image_output";
                     img.src = canvas.toDataURL();
                     imageDiv.innerHTML = '';
@@ -43,7 +60,6 @@ function createOutput(pos) {
         },
 
         onAdd: function (map) {
-            this._map = map;
             var container = L.DomUtil.create('div');
             container.id = "images";
             imageDiv = container;
@@ -53,8 +69,8 @@ function createOutput(pos) {
     }
 }
 
-var a4width = 2480;
-var a4height = 3508;
+var a4width = 2480 / 4;
+var a4height = 3508 / 4;
 
 L.Control.Save = L.Control.extend(createButton("bottomleft", "Save..."));
 L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", {x: a4height, y: a4width}));
