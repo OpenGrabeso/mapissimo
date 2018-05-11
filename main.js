@@ -34,7 +34,17 @@ function createButton(pos, name, dim) {
                         scrollWheelZoom: false,
                         exportControl: false
                     });
-                    var layer = tileLayer(AdditionalMapLayers[0]);
+                    var layerDef = AdditionalMapLayers[0];
+                    mymap.eachLayer(function(l) {
+                        //try to find URL
+                        for (var mi = 0; mi < AdditionalMapLayers.length; mi ++) {
+                            if (AdditionalMapLayers[mi].url === l._url) {
+                                layerDef = AdditionalMapLayers[mi];
+                                break;
+                            }
+                        }
+                    });
+                    var layer = tileLayer(layerDef);
                     layer.addTo(renderMap);
                     renderMap.setView(map.getCenter(), map.getZoom());
                 }
