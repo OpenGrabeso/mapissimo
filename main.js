@@ -6,7 +6,7 @@ var leafletImage = require('leaflet-image');
 
 var cloneLayer = require('leaflet-clonelayer');
 
-var imageDiv;
+var imageDiv, mapDiv;
 
 function createButton(pos, name, dim) {
     return {
@@ -21,12 +21,13 @@ function createButton(pos, name, dim) {
             container.onclick = function() {
                 if (dim) {
                     var mapContainer = L.DomUtil.create('div', 'render-map');
-                    mapContainer.style.position = "absolute";
+                    mapContainer.style.position = "fixed";
                     mapContainer.style.width = dim.x + "px";
                     mapContainer.style.height = dim.y + "px";
+                    mapContainer.style.x = "-" + mapContainer.style.width;
                     //mapContainer.style.display = "none";
-                    imageDiv.innerHTML = '';
-                    imageDiv.appendChild(mapContainer);
+                    mapDiv.innerHTML = '';
+                    mapDiv.appendChild(mapContainer);
                     var renderMap = L.map(mapContainer, {
                         preferCanvas: true,
                         attributionControl: false,
@@ -76,6 +77,9 @@ function createOutput(pos) {
             var container = L.DomUtil.create('div');
             container.id = "images";
             imageDiv = container;
+            container = L.DomUtil.create('div');
+            container.id = "images-map";
+            mapDiv = container;
             return container;
         }
 
