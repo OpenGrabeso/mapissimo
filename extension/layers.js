@@ -20,6 +20,7 @@ var AdditionalMapLayers = (function(){
     var mapboxAttr = osmAttr + ', Tiles courtesy of <a href="https://www.mapbox.com" target="_blank">Mapbox.com</a>';
 	return [
         {type: "tracks", name: "Tracks (+Mapy.cz)",
+            // NG style - cjh226q3j0rtd2roxwnwlwy13
             url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
 			grid: true,
