@@ -56,8 +56,11 @@ function createButton(pos, name, dim) {
                     // now you have canvas
                     var img = document.createElement('img');
                     var dimensions = aMap.getSize();
-                    img.width = dimensions.x / 4;
-                    img.height = dimensions.y / 4;
+                    var maxPreviewSize = 200;
+                    var maxDim = Math.max(dimensions.x, dimensions.y);
+                    var scale = maxDim > maxPreviewSize ? maxPreviewSize / maxDim : 1;
+                    img.width = Math.ceil(dimensions.x * scale);
+                    img.height = Math.ceil(dimensions.y * scale);
                     img.className = "image_output";
                     img.src = canvas.toDataURL();
                     imageDiv.innerHTML = '';
@@ -86,8 +89,9 @@ function createOutput(pos, name, store) {
     }
 }
 
-var a4width = 2480/2;
-var a4height = 3508/2;
+var dpi = 200;
+var a4width = 8 * dpi;
+var a4height = 11 * dpi;
 
 L.Control.OutputMap = L.Control.extend(createOutput("bottomleft", "image-map", function(x){mapDiv = x}));
 L.Control.Output = L.Control.extend(createOutput("bottomleft", "image", function(x){imageDiv = x}));
@@ -112,6 +116,3 @@ L.Map.addInitHook(function () {
         this.addControl(new L.Control.Output());
     }
 });
-
-
-
