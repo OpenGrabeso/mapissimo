@@ -17,12 +17,16 @@ function createButton(pos, name, dim) {
             container.type = "button";
             container.value = name;
             container.onclick = function() {
+
+                var spinner = L.DomUtil.create('div', 'loader');
+                imageDiv.innerHTML = "";
+                imageDiv.appendChild(spinner);
                 if (dim) {
                     var mapContainer = L.DomUtil.create('div', 'render-map');
                     mapContainer.style.position = "fixed";
                     mapContainer.style.width = dim.x + "px";
                     mapContainer.style.height = dim.y + "px";
-                    mapContainer.style.x = "-" + mapContainer.style.width;
+                    mapContainer.style.left = "-" + mapContainer.style.width;
                     //mapContainer.style.display = "none";
                     mapDiv.innerHTML = '';
                     mapDiv.appendChild(mapContainer);
@@ -58,6 +62,7 @@ function createButton(pos, name, dim) {
                     img.src = canvas.toDataURL();
                     imageDiv.innerHTML = '';
                     imageDiv.appendChild(img);
+                    mapDiv.innerHTML = '';
                 }, dim);
             };
             return container;
@@ -65,7 +70,7 @@ function createButton(pos, name, dim) {
     }
 }
 
-function createOutput(pos) {
+function createOutput(pos, name, store) {
     return {
         options: {
             position: pos
@@ -73,11 +78,8 @@ function createOutput(pos) {
 
         onAdd: function (map) {
             var container = L.DomUtil.create('div');
-            container.id = "images";
-            imageDiv = container;
-            container = L.DomUtil.create('div');
-            container.id = "images-map";
-            mapDiv = container;
+            container.id = name;
+            store(container);
             return container;
         }
 
@@ -87,11 +89,12 @@ function createOutput(pos) {
 var a4width = 2480/2;
 var a4height = 3508/2;
 
+L.Control.OutputMap = L.Control.extend(createOutput("bottomleft", "image-map", function(x){mapDiv = x}));
+L.Control.Output = L.Control.extend(createOutput("bottomleft", "image", function(x){imageDiv = x}));
 L.Control.Save = L.Control.extend(createButton("bottomleft", "Save..."));
 L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", {x: a4height, y: a4width}));
 // noinspection JSSuspiciousNameCombination
 L.Control.SavePortrait = L.Control.extend(createButton("bottomleft", "A4 Portrait", {x: a4width, y: a4height}));
-L.Control.Output = L.Control.extend(createOutput("bottomleft"));
 
 L.Map.mergeOptions({
     exportControl: true
@@ -105,6 +108,7 @@ L.Map.addInitHook(function () {
         this.addControl(this.exportControlLandscape);
         this.addControl(this.exportControlPortrait);
         this.addControl(this.exportControl);
+        this.addControl(new L.Control.OutputMap());
         this.addControl(new L.Control.Output());
     }
 });
