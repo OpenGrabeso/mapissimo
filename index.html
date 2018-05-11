@@ -49,14 +49,16 @@
         mymap.setView([50, 10], 6);
     }
 
-    var gl = L.mapboxGL({
-        accessToken: 'pk.eyJ1Ijoib3NwYW5lbCIsImEiOiJjaXQwMXBqaGcwMDZ4MnpvM21ibzl2aGM5In0.1DeBqAQXvxLPajeeSK4jQQ',
-        //style: 'mapbox://styles/ospanel/cjgpk2b1q001n2rt3vz2yvve2'
-        style: 'mapbox://styles/ospanel/cjh226q3j0rtd2roxwnwlwy13'
-    }).addTo(mymap);
-
     function tileLayer(l) {
-        var r = L.tileLayer(l.url, l.opts);
+        var r;
+        if (l.style) {
+            r = L.mapboxGL({
+                accessToken: mapboxToken,
+                style: l.style
+            });
+        } else {
+            r = L.tileLayer(l.url, l.opts);
+        }
         if (l.overlay) {
             var o = L.tileLayer(l.overlay.url, l.overlay.opts);
             r = L.layerGroup([r, o, L.grid()]);
@@ -68,8 +70,8 @@
 
     var baseMaps = buildBaseMaps();
 
-    //L.control.layers(baseMaps).addTo(mymap);
-    //baseMaps[mapLayers[0].name].addTo(mymap);
+    L.control.layers(baseMaps).addTo(mymap);
+    baseMaps[mapLayers[0].name].addTo(mymap);
     var geocoderOptions = {
         defaultMarkGeocode: false
     };
