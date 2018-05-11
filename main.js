@@ -4,8 +4,6 @@
 
 var leafletImage = require('leaflet-image');
 
-var cloneLayer = require('leaflet-clonelayer');
-
 var imageDiv, mapDiv;
 
 function createButton(pos, name, dim) {
