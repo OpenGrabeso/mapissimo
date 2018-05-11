@@ -21,18 +21,21 @@ function createButton(pos, name, dim) {
             container.onclick = function() {
                 if (dim) {
                     var mapContainer = L.DomUtil.create('div', 'render-map');
-                    mapContainer.position = "absolute";
+                    mapContainer.style.position = "absolute";
                     mapContainer.style.width = dim.x + "px";
                     mapContainer.style.height = dim.y + "px";
+                    //mapContainer.style.display = "none";
                     imageDiv.innerHTML = '';
                     imageDiv.appendChild(mapContainer);
                     var renderMap = L.map(mapContainer, {
+                        preferCanvas: true,
                         attributionControl: false,
                         zoomControl: false,
                         scrollWheelZoom: false,
                         exportControl: false
                     });
-                    cloneLayer(baseMaps[AdditionalMapLayers[0].name]).addTo(renderMap);
+                    var layer = tileLayer(AdditionalMapLayers[0]);
+                    layer.addTo(renderMap);
                     renderMap.setView(map.getCenter(), map.getZoom());
                 }
                 var aMap = dim ? renderMap : mymap;
@@ -69,8 +72,8 @@ function createOutput(pos) {
     }
 }
 
-var a4width = 2480 / 4;
-var a4height = 3508 / 4;
+var a4width = 2480/2;
+var a4height = 3508/2;
 
 L.Control.Save = L.Control.extend(createButton("bottomleft", "Save..."));
 L.Control.SaveLandscape = L.Control.extend(createButton("bottomleft", "A4 Landscape", {x: a4height, y: a4width}));
