@@ -30,11 +30,28 @@ html, body {
     border-bottom: 1px solid #ccc;
     width: 26px;
     height: 26px;
-    line-height: 26px;
     display: block;
     text-align: center;
     text-decoration: none;
     color: black;
     padding-top: 0.3em;
     font: bold 12px/20px Tahoma, Verdana, sans-serif;
+}
+
+.image_output {
+    border: #0000ff 2px solid;
+}
+
+.loader {
+    border: 10px solid #CCC; /* Light grey */
+    border-top: 10px solid #3AE; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

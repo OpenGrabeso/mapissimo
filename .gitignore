@@ -1,4 +1,6 @@
 .idea/
-strava-map-switcher.iml
+node_modules/
 /extension.zip
-mapissimo.iml
+bundle.js
+*.iml
+
