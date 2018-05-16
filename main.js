@@ -4,7 +4,14 @@
 
 var leafletImage = require('leaflet-image');
 
-var imageDiv, mapDiv;
+var imageDiv, mapDiv, dpiText;
+
+var dpi = 200;
+var minDpi = 100;
+var maxDpi = 600;
+var dpiStep = 20;
+function a4width() {return 8 * dpi;}
+function a4height() {return 11 * dpi;}
 
 function createButton(pos, name, fun) {
     return {
@@ -31,11 +38,27 @@ function createOutput(pos, name, store) {
         onAdd: function (map) {
             var container = L.DomUtil.create('div');
             container.id = name;
-            store(container);
+            if (store) store(container);
             return container;
         }
 
     }
+}
+
+function createText(pos, getter, store) {
+    return {
+        options: {
+            position: pos
+        },
+
+        onAdd: function (map) {
+            var container = L.DomUtil.create('div', 'leaflet-control-zoom-display leaflet-bar-part leaflet-bar');
+            var v = getter();
+            container.innerHTML = v;
+            if (store) store(container);
+            return container;
+        },
+    };
 }
 
 function saveFun(dim) {
@@ -45,10 +68,11 @@ function saveFun(dim) {
         imageDiv.innerHTML = "";
         imageDiv.appendChild(spinner);
         if (dim) {
+            var d = dim();
             var mapContainer = L.DomUtil.create('div', 'render-map');
             mapContainer.style.position = "fixed";
-            mapContainer.style.width = dim.x + "px";
-            mapContainer.style.height = dim.y + "px";
+            mapContainer.style.width = d.x + "px";
+            mapContainer.style.height = d.y + "px";
             mapContainer.style.left = "-" + mapContainer.style.width;
             //mapContainer.style.display = "none";
             mapDiv.innerHTML = '';
@@ -93,18 +117,12 @@ function saveFun(dim) {
     };
 }
 
-var dpi = 200;
-var minDpi = 100;
-var maxDpi = 600;
-var dpiStep = 50;
-var a4width = 8 * dpi;
-var a4height = 11 * dpi;
-
 function adjustDpi(steps) {
     var newDpi = dpi + dpiStep * steps;
     newDpi = Math.max(newDpi, minDpi);
-    newDpi = Math.min(newDpi, minDpi);
+    newDpi = Math.min(newDpi, maxDpi);
     dpi = newDpi;
+    dpiText.innerHTML = dpi.toString();
 }
 
 L.Map.mergeOptions({
@@ -117,9 +135,10 @@ L.Map.addInitHook(function () {
         // noinspection JSSuspiciousNameCombination
         var createControls = [
             createButton("bottomleft", "Save...", saveFun()),
-            createButton("bottomleft", "A4 Landscape", saveFun({x: a4height, y: a4width})),
-            createButton("bottomleft", "A4 Portrait", saveFun({x: a4width, y: a4height})),
+            createButton("bottomleft", "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}})),
+            createButton("bottomleft", "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}})),
             createButton("bottomleft", "DPI +", function(){adjustDpi(+1)}),
+            createText("bottomleft", function(){return dpi.toString();}, function(x){dpiText = x}),
             createButton("bottomleft", "DPI -", function(){adjustDpi(-1)}),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
