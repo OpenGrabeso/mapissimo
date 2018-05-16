@@ -17,7 +17,7 @@ function createButton(pos, name, fun) {
             var container = L.DomUtil.create('input');
             container.type = "button";
             container.value = name;
-            container.onclick = fun;
+            container.onclick = function(){fun(map)};
             return container;
         }
     };
@@ -40,7 +40,7 @@ function createOutput(pos, name, store) {
 }
 
 function saveFun(dim) {
-    return function() {
+    return function(map) {
 
         var spinner = L.DomUtil.create('div', 'loader');
         imageDiv.innerHTML = "";
@@ -95,8 +95,18 @@ function saveFun(dim) {
 }
 
 var dpi = 200;
+var minDpi = 100;
+var maxDpi = 600;
+var dpiStep = 50;
 var a4width = 8 * dpi;
 var a4height = 11 * dpi;
+
+function adjustDpi(steps) {
+    var newDpi = dpi + dpiStep * steps;
+    newDpi = Math.max(newDpi, minDpi);
+    newDpi = Math.min(newDpi, minDpi);
+    dpi = newDpi;
+}
 
 L.Map.mergeOptions({
     exportControl: true
@@ -107,11 +117,13 @@ L.Map.addInitHook(function () {
 
         // noinspection JSSuspiciousNameCombination
         var createControls = [
-            createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
-            createOutput("bottomleft", "image", function(x){imageDiv = x}),
             createButton("bottomleft", "Save...", saveFun()),
             createButton("bottomleft", "A4 Landscape", saveFun({x: a4height, y: a4width})),
             createButton("bottomleft", "A4 Portrait", saveFun({x: a4width, y: a4height})),
+            createButton("bottomleft", "DPI +", function(){adjustDpi(+1)}),
+            createButton("bottomleft", "DPI -", function(){adjustDpi(-1)}),
+            createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
+            createOutput("bottomleft", "image", function(x){imageDiv = x}),
         ];
         for (var c in createControls) {
             var ci = createControls[c];
