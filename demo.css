@@ -31,7 +31,7 @@ html, body {
     color: black;
     padding-top: 0.3em;
     font: bold 12px/20px Tahoma, Verdana, sans-serif;
-    display: block;
+    display: inline;
     text-align: center;
 }
 

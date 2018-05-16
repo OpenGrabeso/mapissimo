@@ -13,6 +13,27 @@ var dpiStep = 20;
 function a4width() {return 8 * dpi;}
 function a4height() {return 11 * dpi;}
 
+function setDPI(container) {
+    container.value = "DPI: " + dpi.toString();
+}
+function createTextControl(store) {
+    var container = L.DomUtil.create('input', 'leaflet-control-display leaflet-bar-part leaflet-bar');
+    container.type = "button";
+    setDPI(container);
+    if (store) store(container);
+    return container;
+}
+
+function createButtonControl(map, name, fun) {
+    var container = L.DomUtil.create('input', 'leaflet-bar-part leaflet-bar leaflet-control-display');
+    container.type = "button";
+    container.value = name;
+    container.onclick = function(){fun(map)};
+    return container;
+}
+
+
+
 function createButton(pos, name, fun) {
     return {
         options: {
@@ -20,10 +41,23 @@ function createButton(pos, name, fun) {
         },
 
         onAdd: function (map) {
-            var container = L.DomUtil.create('input', 'leaflet-bar-part leaflet-bar leaflet-control-display');
-            container.type = "button";
-            container.value = name;
-            container.onclick = function(){fun(map)};
+            return createButtonControl(map, name, fun);
+        }
+    };
+}
+
+function createControlGroup(pos, buttons) {
+    return {
+        options: {
+            position: pos
+        },
+
+        onAdd: function (map) {
+            var container = L.DomUtil.create('div');
+            for (var b in buttons) {
+                var item = buttons[b](map);
+                container.appendChild(item);
+            }
             return container;
         }
     };
@@ -52,11 +86,7 @@ function createText(pos, getter, store) {
         },
 
         onAdd: function (map) {
-            var container = L.DomUtil.create('div', 'leaflet-control-display leaflet-bar-part leaflet-bar');
-            var v = getter();
-            container.innerHTML = v;
-            if (store) store(container);
-            return container;
+            return createTextControl(getter, store);
         },
     };
 }
@@ -122,8 +152,9 @@ function adjustDpi(steps) {
     newDpi = Math.max(newDpi, minDpi);
     newDpi = Math.min(newDpi, maxDpi);
     dpi = newDpi;
-    dpiText.innerHTML = dpi.toString();
+    setDPI(dpiText);
 }
+
 
 L.Map.mergeOptions({
     exportControl: true
@@ -134,12 +165,18 @@ L.Map.addInitHook(function () {
 
         // noinspection JSSuspiciousNameCombination
         var createControls = [
-            createButton("bottomleft", "Save...", saveFun()),
-            createButton("bottomleft", "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}})),
-            createButton("bottomleft", "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}})),
-            createButton("bottomleft", "DPI +", function(){adjustDpi(+1)}),
-            createText("bottomleft", function(){return dpi.toString();}, function(x){dpiText = x}),
-            createButton("bottomleft", "DPI -", function(){adjustDpi(-1)}),
+            createControlGroup("bottomleft", [
+                function(map){return createButtonControl(map, "Window", saveFun())},
+                function(map){return createButtonControl(map, "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}}))},
+                function(map){return createButtonControl(map, "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}}))},
+                ]),
+            createControlGroup(
+                "bottomleft", [
+                    function(map){return createButtonControl(map, "+", function(){adjustDpi(+1)})},
+                    function(map){return createTextControl(function(x){dpiText = x})},
+                    function(map){return createButtonControl(map, "-", function(){adjustDpi(-1)})},
+                ],
+            ),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
         ];
@@ -151,3 +188,4 @@ L.Map.addInitHook(function () {
         }
     }
 });
+
