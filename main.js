@@ -8,7 +8,7 @@ var imageDiv, mapDiv, dpiText;
 
 var dpi = 200;
 var minDpi = 100;
-var maxDpi = 600;
+var maxDpi = 300;
 var dpiStep = 20;
 function a4width() {return 8 * dpi;}
 function a4height() {return 11 * dpi;}
