@@ -9,7 +9,7 @@ var imageDiv, mapDiv, dpiText;
 
 var dpi = 200;
 var minDpi = 100;
-var maxDpi = 600;
+var maxDpi = 300;
 var dpiStep = 20;
 function a4width() {return 8 * dpi;}
 function a4height() {return 11 * dpi;}
@@ -21,7 +21,7 @@ function createButton(pos, name, fun) {
         },
 
         onAdd: function (map) {
-            var container = L.DomUtil.create('input');
+            var container = L.DomUtil.create('input', 'leaflet-bar-part leaflet-bar leaflet-control-display');
             container.type = "button";
             container.value = name;
             container.onclick = function(){fun(map)};
@@ -53,7 +53,7 @@ function createText(pos, getter, store) {
         },
 
         onAdd: function (map) {
-            var container = L.DomUtil.create('div', 'leaflet-control-zoom-display leaflet-bar-part leaflet-bar');
+            var container = L.DomUtil.create('div', 'leaflet-control-display leaflet-bar-part leaflet-bar');
             var v = getter();
             container.innerHTML = v;
             if (store) store(container);

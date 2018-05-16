@@ -25,17 +25,20 @@ html, body {
     width: 100%;
 }
 
-.leaflet-control-zoom-display {
+.leaflet-control-display {
     background-color: #fff;
     border-bottom: 1px solid #ccc;
-    width: 26px;
-    height: 26px;
-    display: block;
-    text-align: center;
-    text-decoration: none;
     color: black;
     padding-top: 0.3em;
     font: bold 12px/20px Tahoma, Verdana, sans-serif;
+    display: block;
+    text-align: center;
+}
+
+.leaflet-control-zoom-display {
+    width: 26px;
+    height: 26px;
+    text-decoration: none;
 }
 
 .image_output {
