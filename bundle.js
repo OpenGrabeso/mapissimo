@@ -9,7 +9,7 @@ var imageDiv, mapDiv, dpiText;
 
 var dpi = 200;
 var minDpi = 100;
-var maxDpi = 300;
+var maxDpi = 320;
 var dpiStep = 20;
 function a4width() {return 8 * dpi;}
 function a4height() {return 11 * dpi;}
@@ -195,7 +195,6 @@ L.Map.addInitHook(function () {
         }
     }
 });
-
 
 },{"leaflet-image":3}],2:[function(require,module,exports){
 (function (global, factory) {
