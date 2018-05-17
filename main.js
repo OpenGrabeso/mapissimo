@@ -4,6 +4,10 @@
 
 var leafletImage = require('leaflet-image');
 
+var mapboxToken = "pk.eyJ1Ijoib3NwYW5lbCIsImEiOiJjamhhOG0yZ2EwOGJ3MzBxcDY3eXZ1dGprIn0.ZQVprI8zqlpnJCSZ67VtXg";
+
+mapLayers = generateMapLayers(mapboxToken);
+
 var imageDiv, mapDiv, dpiText;
 
 var dpi = 200;
@@ -120,12 +124,12 @@ function saveFun(dim) {
                 scrollWheelZoom: false,
                 exportControl: false
             });
-            var layerDef = AdditionalMapLayers[0];
+            var layerDef = mapLayers[0];
             mymap.eachLayer(function(l) {
                 //try to find URL
-                for (var mi = 0; mi < AdditionalMapLayers.length; mi ++) {
-                    if (AdditionalMapLayers[mi].url === l._url) {
-                        layerDef = AdditionalMapLayers[mi];
+                for (var mi = 0; mi < mapLayers.length; mi ++) {
+                    if (mapLayers[mi].url === l._url) {
+                        layerDef = mapLayers[mi];
                         break;
                     }
                 }

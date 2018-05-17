@@ -16,7 +16,6 @@
   <script src="lib/leaflet.restoreview.js"></script>
   <script src="lib/leaflet.zoomdisplay.js"></script>
   <script src="extension/leaflet.grid.js"></script>
-
 </head>
 <body>
 
@@ -28,10 +27,10 @@
 
     function buildBaseMaps() {
         var baseMaps = {};
-        for (var i = 0; i < AdditionalMapLayers.length; i++ ) {
-            var layer = AdditionalMapLayers[i];
-            var tiles = tileLayer(layer);
-            baseMaps[layer.name] = tiles;
+        var layers = mapLayers;
+        for (var i = 0; i < layers.length; i++ ) {
+            var layer = layers[i];
+            baseMaps[layer.name] = tileLayer(layer);
         }
         return baseMaps;
     }
@@ -56,7 +55,7 @@
     var baseMaps = buildBaseMaps();
 
     L.control.layers(baseMaps).addTo(mymap);
-    baseMaps[AdditionalMapLayers[0].name].addTo(mymap);
+    baseMaps[mapLayers[0].name].addTo(mymap);
 
 </script>
 

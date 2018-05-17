@@ -10,7 +10,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var AdditionalMapLayers = (function(){
+function generateMapLayers(token){
 	var osmAttr = '&copy; <a href="http://openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
 	var mtbMapAttr = osmAttr + ', Tiles courtesy of <a href="http://mtbmap.cz/" target="_blank">mtbmap.cz</a>';
 	var osmCzAttr = ', Tiles courtesy of <a href="https://openstreetmap.cz" target="_blank">openstreetmap.cz</a>';
@@ -21,7 +21,7 @@ var AdditionalMapLayers = (function(){
 	return [
         {type: "tracks", name: "Tracks (+Mapy.cz)",
             // NG style - cjh226q3j0rtd2roxwnwlwy13
-            url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+            url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=" + token,
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
 			grid: true,
             overlay:
@@ -59,4 +59,6 @@ var AdditionalMapLayers = (function(){
 				{url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
 					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}}},
 	];
-})();
+};
+
+var AdditionalMapLayers = generateMapLayers("pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg"); // Strava mapbox access token
