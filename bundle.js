@@ -29,7 +29,13 @@ function createButtonControl(map, name, fun) {
     var container = L.DomUtil.create('input', 'leaflet-bar-part leaflet-bar leaflet-control-display');
     container.type = "button";
     container.value = name;
-    container.onclick = function(){fun(map)};
+    container.onclick = function(){
+        fun(map);
+    };
+    container.ondblclick = function (event) {
+        event.stopPropagation();
+        return false;
+    };
     return container;
 }
 
