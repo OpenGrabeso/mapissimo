@@ -19,6 +19,11 @@ function generateMapLayers(token){
 	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">OpenTopoMap.org</a>';
     var mapboxAttr = osmAttr + ', Tiles courtesy of <a href="https://www.mapbox.com" target="_blank">Mapbox.com</a>';
 	return [
+        {type: "routes", name: "Tracks&Routes",
+            url: "https://api.mapbox.com/styles/v1/ospanel/cjhbykqgr07cz2rph29u6h6yl/tiles/256/{z}/{x}/{y}?access_token=" + token,
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
+            grid: true,
+        },
         {type: "tracks", name: "Tracks (+Mapy.cz)",
             // NG style - cjh226q3j0rtd2roxwnwlwy13
             url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=" + token,
