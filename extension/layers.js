@@ -24,16 +24,6 @@ function generateMapLayers(token){
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        {type: "tracks", name: "Tracks (+Mapy.cz)",
-            // NG style - cjh226q3j0rtd2roxwnwlwy13
-            url: "https://api.mapbox.com/styles/v1/ospanel/cjgpk2b1q001n2rt3vz2yvve2/tiles/256/{z}/{x}/{y}?access_token=" + token,
-            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
-			grid: true,
-            overlay:
-                {url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzOnlyAttr}
-				},
-        },
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			opts: {maxZoom: 20, maxNativeZoom: 19, attribution: osmAttr}},
