@@ -31,7 +31,7 @@ function generateMapLayers(token){
             grid: true,
             overlay:
                 {url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", attribution: stravaAttr}}
+                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", opacity: 0.6, transparency: 'true', attribution: stravaAttr}}
         },
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
