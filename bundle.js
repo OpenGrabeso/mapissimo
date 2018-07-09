@@ -133,6 +133,19 @@ function createMapRender(name, dx, dy, pos, zoom) {
     renderMap.setView(pos, zoom);
     return renderMap;
 }
+
+function previewSize(d, zoom) {
+    var maxPreviewRenderSize = 800;
+    var dx = d.x;
+    var dy = d.y;
+    while (zoom > 0 && (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize)) {
+        zoom -= 1;
+        dx /= 2;
+        dy /= 2;
+    }
+    return {dx: dx, dy: dy, zoom: zoom};
+}
+
 function saveFun(dim) {
     return function(map) {
 
@@ -146,14 +159,12 @@ function saveFun(dim) {
         }
         var aMap = dim ? renderMap : mymap;
         leafletImage(aMap, function(err, canvas) {
+            var ps = previewSize(dim(), map.getZoom());
             // now you have canvas
             var img = document.createElement('img');
             var dimensions = aMap.getSize();
-            var maxPreviewSize = 200;
-            var maxDim = Math.max(dimensions.x, dimensions.y);
-            var scale = maxDim > maxPreviewSize ? maxPreviewSize / maxDim : 1;
-            img.width = Math.ceil(dimensions.x * scale);
-            img.height = Math.ceil(dimensions.y * scale);
+            img.width = ps.dx / 2;
+            img.height = ps.dy / 2;
             img.className = "image_output";
             img.src = canvas.toDataURL();
             imageDiv.innerHTML = '';
@@ -172,23 +183,20 @@ function selectPreviewFun(map, dim) {
 }
 
 function updatePreview(map) {
-    if (previewDimFun) {
+    if (previewDimFun && map.getZoom() > 8) {
         previewFun(map, previewDimFun);
+    } else {
+        previewDiv.innerHTML = '';
     }
 }
 
 function previewFun(map, dim) {
-    var maxPreviewRenderSize = 800;
 
-    var d = dim();
-    var dx = d.x;
-    var dy = d.y;
-    var zoom = map.getZoom();
-    while (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize) {
-        zoom -= 1;
-        dx /= 2;
-        dy /= 2;
-    }
+    var ps = previewSize(dim(), map.getZoom());
+
+    var dx = ps.dx;
+    var dy = ps.dy;
+    var zoom = ps.zoom;
 
     var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
 
