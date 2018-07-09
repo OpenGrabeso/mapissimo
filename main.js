@@ -257,5 +257,10 @@ L.Map.addInitHook(function () {
             var ccn = new cc();
             this.addControl(ccn);
         }
+
+        var map = this;
+        map.on("moveend", function () {
+            updatePreview(map);
+        });
     }
 });
