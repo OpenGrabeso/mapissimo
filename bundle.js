@@ -9,7 +9,7 @@ mapboxToken = "pk.eyJ1Ijoib3NwYW5lbCIsImEiOiJjamhhOG0yZ2EwOGJ3MzBxcDY3eXZ1dGprIn
 
 mapLayers = generateMapLayers(mapboxToken);
 
-var imageDiv, mapDiv, dpiText;
+var imageDiv, previewDiv, mapDiv, dpiText;
 
 var dpi = 200;
 var minDpi = 100;
@@ -102,42 +102,47 @@ function createText(pos, getter, store) {
     };
 }
 
+function createMapRender(name, dx, dy, pos, zoom) {
+    var mapContainer = L.DomUtil.create('div', name);
+    mapContainer.style.position = "fixed";
+    mapContainer.style.width = dx + "px";
+    mapContainer.style.height = dy + "px";
+    mapContainer.style.left = "-" + mapContainer.style.width;
+    //mapContainer.style.display = "none";
+    mapDiv.innerHTML = '';
+    mapDiv.appendChild(mapContainer);
+    var renderMap = L.map(mapContainer, {
+        preferCanvas: true,
+        attributionControl: false,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        exportControl: false
+    });
+    var layerDef = mapLayers[0];
+    mymap.eachLayer(function(l) {
+        //try to find URL
+        for (var mi = 0; mi < mapLayers.length; mi ++) {
+            if (mapLayers[mi].url === l._url) {
+                layerDef = mapLayers[mi];
+                break;
+            }
+        }
+    });
+    var layer = tileLayer(layerDef);
+    layer.addTo(renderMap);
+    renderMap.setView(pos, zoom);
+    return renderMap;
+}
 function saveFun(dim) {
     return function(map) {
 
+        var renderMap;
         var spinner = L.DomUtil.create('div', 'loader');
         imageDiv.innerHTML = "";
         imageDiv.appendChild(spinner);
         if (dim) {
             var d = dim();
-            var mapContainer = L.DomUtil.create('div', 'render-map');
-            mapContainer.style.position = "fixed";
-            mapContainer.style.width = d.x + "px";
-            mapContainer.style.height = d.y + "px";
-            mapContainer.style.left = "-" + mapContainer.style.width;
-            //mapContainer.style.display = "none";
-            mapDiv.innerHTML = '';
-            mapDiv.appendChild(mapContainer);
-            var renderMap = L.map(mapContainer, {
-                preferCanvas: true,
-                attributionControl: false,
-                zoomControl: false,
-                scrollWheelZoom: false,
-                exportControl: false
-            });
-            var layerDef = mapLayers[0];
-            mymap.eachLayer(function(l) {
-                //try to find URL
-                for (var mi = 0; mi < mapLayers.length; mi ++) {
-                    if (mapLayers[mi].url === l._url) {
-                        layerDef = mapLayers[mi];
-                        break;
-                    }
-                }
-            });
-            var layer = tileLayer(layerDef);
-            layer.addTo(renderMap);
-            renderMap.setView(map.getCenter(), map.getZoom());
+            renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
         }
         var aMap = dim ? renderMap : mymap;
         leafletImage(aMap, function(err, canvas) {
@@ -158,14 +163,65 @@ function saveFun(dim) {
     };
 }
 
-function adjustDpi(steps) {
+var previewDimFun;
+
+function selectPreviewFun(map, dim) {
+    previewDimFun = previewFun(dim);
+    updatePreview(map);
+}
+
+function updatePreview(map) {
+    if (previewDimFun) {
+        previewDimFun(map);
+    }
+}
+
+function previewFun(dim) {
+    return function(map) {
+
+        var maxPreviewRenderSize = 800;
+
+        var d = dim();
+        var dx = d.x;
+        var dy = d.y;
+        var zoom = map.getZoom();
+        while (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize) {
+            zoom -= 1;
+            dx /= 2;
+            dy /= 2;
+        }
+
+        var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
+
+        leafletImage(renderMap, function(err, canvas) {
+            // now you have canvas
+            var img = document.createElement('img');
+            img.width = dx / 2;
+            img.height = dy / 2;
+            img.className = "image_output";
+            img.src = canvas.toDataURL();
+            previewDiv.innerHTML = '';
+            previewDiv.appendChild(img);
+            mapDiv.innerHTML = '';
+        }, dim);
+    };
+}
+
+function adjustDpi(map, steps) {
     var newDpi = dpi + dpiStep * steps;
     newDpi = Math.max(newDpi, minDpi);
     newDpi = Math.min(newDpi, maxDpi);
     dpi = newDpi;
     setDPI(dpiText);
+    updatePreview(map);
 }
 
+function landscapeDim() {
+    return {x: a4height(), y: a4width()};
+}
+function portraitDim() {
+    return {x: a4width(), y: a4height()};
+}
 
 L.Map.mergeOptions({
     exportControl: true
@@ -178,17 +234,22 @@ L.Map.addInitHook(function () {
         var createControls = [
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Window", saveFun())},
-                function(map){return createButtonControl(map, "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}}))},
-                function(map){return createButtonControl(map, "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}}))},
+                function(map){return createButtonControl(map, "A4 Landscape", saveFun(landscapeDim))},
+                function(map){return createButtonControl(map, "A4 Portrait", saveFun(portraitDim))},
                 ]),
+            createControlGroup("bottomleft", [
+                function(map){return createButtonControl(map, "A4 Landscape Preview", function(map){selectPreviewFun(map, landscapeDim)})},
+                function(map){return createButtonControl(map, "A4 Portrait Preview", function(map){selectPreviewFun(map, portraitDim)})},
+            ]),
             createControlGroup(
                 "bottomleft", [
-                    function(map){return createButtonControl(map, "+", function(){adjustDpi(+1)})},
+                    function(map){return createButtonControl(map, "+", function(map){adjustDpi(map, +1)})},
                     function(map){return createTextControl(function(x){dpiText = x})},
-                    function(map){return createButtonControl(map, "-", function(){adjustDpi(-1)})},
+                    function(map){return createButtonControl(map, "-", function(map){adjustDpi(map, -1)})},
                 ],
             ),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
+            createOutput("bottomleft", "preview", function(x){previewDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
         ];
         for (var c in createControls) {
@@ -197,6 +258,11 @@ L.Map.addInitHook(function () {
             var ccn = new cc();
             this.addControl(ccn);
         }
+
+        var map = this;
+        map.on("moveend", function () {
+            updatePreview(map);
+        });
     }
 });
 
