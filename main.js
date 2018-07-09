@@ -134,10 +134,9 @@ function createMapRender(name, dx, dy, pos, zoom) {
 }
 
 function previewSize(d, zoom) {
-    var maxPreviewRenderSize = 800;
     var dx = d.x;
     var dy = d.y;
-    while (zoom > 0 && (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize)) {
+    while (zoom > 0 && (dx > 900 || dy > 600)) {
         zoom -= 1;
         dx /= 2;
         dy /= 2;
@@ -145,35 +144,38 @@ function previewSize(d, zoom) {
     return {dx: dx, dy: dy, zoom: zoom};
 }
 
-function saveFun(dim) {
-    return function(map) {
+var previewDimFun;
 
-        var renderMap;
-        var spinner = L.DomUtil.create('div', 'loader');
-        imageDiv.innerHTML = "";
-        imageDiv.appendChild(spinner);
-        if (dim) {
-            var d = dim();
-            renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
-        }
-        var aMap = dim ? renderMap : mymap;
-        leafletImage(aMap, function(err, canvas) {
-            var ps = previewSize(dim(), map.getZoom());
-            // now you have canvas
-            var img = document.createElement('img');
-            var dimensions = aMap.getSize();
-            img.width = ps.dx / 2;
-            img.height = ps.dy / 2;
-            img.className = "image_output";
-            img.src = canvas.toDataURL();
-            imageDiv.innerHTML = '';
-            imageDiv.appendChild(img);
-            mapDiv.innerHTML = '';
-        }, dim);
-    };
+function currentMapDim() {
+    return mymap.getSize();
 }
 
-var previewDimFun;
+function saveFun(map) {
+    var dim = previewDimFun;
+    var renderMap;
+    var spinner = L.DomUtil.create('div', 'loader');
+    imageDiv.innerHTML = "";
+    imageDiv.appendChild(spinner);
+    if (dim) {
+        var d = dim();
+        renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
+    }
+    var aMap = dim ? renderMap : map;
+    leafletImage(aMap, function(err, canvas) {
+        var d = dim ? dim : currentMapDim;
+        var ps = previewSize(d(), map.getZoom());
+        // now you have canvas
+        var img = document.createElement('img');
+        var dimensions = aMap.getSize();
+        img.width = ps.dx / 2;
+        img.height = ps.dy / 2;
+        img.className = "image_output";
+        img.src = canvas.toDataURL();
+        imageDiv.innerHTML = '';
+        imageDiv.appendChild(img);
+        mapDiv.innerHTML = '';
+    }, dim);
+}
 
 function selectPreviewFun(map, dim) {
     previewDimFun = dim;
@@ -238,13 +240,12 @@ L.Map.addInitHook(function () {
         // noinspection JSSuspiciousNameCombination
         var createControls = [
             createControlGroup("bottomleft", [
-                function(map){return createButtonControl(map, "Window", saveFun())},
-                function(map){return createButtonControl(map, "A4 Landscape", saveFun(landscapeDim))},
-                function(map){return createButtonControl(map, "A4 Portrait", saveFun(portraitDim))},
+                function(map){return createButtonControl(map, "Print", function(map){saveFun(map)})},
                 ]),
             createControlGroup("bottomleft", [
-                function(map){return createButtonControl(map, "A4 Landscape Preview", function(map){selectPreviewFun(map, landscapeDim)})},
-                function(map){return createButtonControl(map, "A4 Portrait Preview", function(map){selectPreviewFun(map, portraitDim)})},
+                function(map){return createButtonControl(map, "Window", function(map){selectPreviewFun(map, undefined)})},
+                function(map){return createButtonControl(map, "A4 Landscape", function(map){selectPreviewFun(map, landscapeDim)})},
+                function(map){return createButtonControl(map, "A4 Portrait", function(map){selectPreviewFun(map, portraitDim)})},
             ]),
             createControlGroup(
                 "bottomleft", [
