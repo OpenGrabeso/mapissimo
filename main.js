@@ -8,7 +8,7 @@ mapboxToken = "pk.eyJ1Ijoib3NwYW5lbCIsImEiOiJjamhhOG0yZ2EwOGJ3MzBxcDY3eXZ1dGprIn
 
 mapLayers = generateMapLayers(mapboxToken);
 
-var imageDiv, mapDiv, dpiText;
+var imageDiv, previewDiv, mapDiv, dpiText;
 
 var dpi = 200;
 var minDpi = 100;
@@ -101,42 +101,47 @@ function createText(pos, getter, store) {
     };
 }
 
+function createMapRender(name, dx, dy, pos, zoom) {
+    var mapContainer = L.DomUtil.create('div', name);
+    mapContainer.style.position = "fixed";
+    mapContainer.style.width = dx + "px";
+    mapContainer.style.height = dy + "px";
+    mapContainer.style.left = "-" + mapContainer.style.width;
+    //mapContainer.style.display = "none";
+    mapDiv.innerHTML = '';
+    mapDiv.appendChild(mapContainer);
+    var renderMap = L.map(mapContainer, {
+        preferCanvas: true,
+        attributionControl: false,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        exportControl: false
+    });
+    var layerDef = mapLayers[0];
+    mymap.eachLayer(function(l) {
+        //try to find URL
+        for (var mi = 0; mi < mapLayers.length; mi ++) {
+            if (mapLayers[mi].url === l._url) {
+                layerDef = mapLayers[mi];
+                break;
+            }
+        }
+    });
+    var layer = tileLayer(layerDef);
+    layer.addTo(renderMap);
+    renderMap.setView(pos, zoom);
+    return renderMap;
+}
 function saveFun(dim) {
     return function(map) {
 
+        var renderMap;
         var spinner = L.DomUtil.create('div', 'loader');
         imageDiv.innerHTML = "";
         imageDiv.appendChild(spinner);
         if (dim) {
             var d = dim();
-            var mapContainer = L.DomUtil.create('div', 'render-map');
-            mapContainer.style.position = "fixed";
-            mapContainer.style.width = d.x + "px";
-            mapContainer.style.height = d.y + "px";
-            mapContainer.style.left = "-" + mapContainer.style.width;
-            //mapContainer.style.display = "none";
-            mapDiv.innerHTML = '';
-            mapDiv.appendChild(mapContainer);
-            var renderMap = L.map(mapContainer, {
-                preferCanvas: true,
-                attributionControl: false,
-                zoomControl: false,
-                scrollWheelZoom: false,
-                exportControl: false
-            });
-            var layerDef = mapLayers[0];
-            mymap.eachLayer(function(l) {
-                //try to find URL
-                for (var mi = 0; mi < mapLayers.length; mi ++) {
-                    if (mapLayers[mi].url === l._url) {
-                        layerDef = mapLayers[mi];
-                        break;
-                    }
-                }
-            });
-            var layer = tileLayer(layerDef);
-            layer.addTo(renderMap);
-            renderMap.setView(map.getCenter(), map.getZoom());
+            renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
         }
         var aMap = dim ? renderMap : mymap;
         leafletImage(aMap, function(err, canvas) {
@@ -162,8 +167,8 @@ function previewFun(dim) {
 
         var maxPreviewRenderSize = 800;
         var spinner = L.DomUtil.create('div', 'loader');
-        imageDiv.innerHTML = "";
-        imageDiv.appendChild(spinner);
+        previewDiv.innerHTML = "";
+        previewDiv.appendChild(spinner);
 
         var d = dim();
         var dx = d.x;
@@ -174,34 +179,8 @@ function previewFun(dim) {
             dx /= 2;
             dy /= 2;
         }
-        var mapContainer = L.DomUtil.create('div', 'preview-map');
-        mapContainer.style.position = "fixed";
-        mapContainer.style.width = dx + "px";
-        mapContainer.style.height = dy + "px";
-        mapContainer.style.left = "-" + mapContainer.style.width;
-        //mapContainer.style.display = "none";
-        mapDiv.innerHTML = '';
-        mapDiv.appendChild(mapContainer);
-        var renderMap = L.map(mapContainer, {
-            preferCanvas: true,
-            attributionControl: false,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            exportControl: false
-        });
-        var layerDef = mapLayers[0];
-        mymap.eachLayer(function(l) {
-            //try to find URL
-            for (var mi = 0; mi < mapLayers.length; mi ++) {
-                if (mapLayers[mi].url === l._url) {
-                    layerDef = mapLayers[mi];
-                    break;
-                }
-            }
-        });
-        var layer = tileLayer(layerDef);
-        layer.addTo(renderMap);
-        renderMap.setView(map.getCenter(), zoom);
+
+        var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
 
         leafletImage(renderMap, function(err, canvas) {
             // now you have canvas
@@ -210,8 +189,8 @@ function previewFun(dim) {
             img.height = dy / 2;
             img.className = "image_output";
             img.src = canvas.toDataURL();
-            imageDiv.innerHTML = '';
-            imageDiv.appendChild(img);
+            previewDiv.innerHTML = '';
+            previewDiv.appendChild(img);
             mapDiv.innerHTML = '';
         }, dim);
     };
@@ -252,6 +231,7 @@ L.Map.addInitHook(function () {
                 ],
             ),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
+            createOutput("bottomleft", "preview", function(x){previewDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
         ];
         for (var c in createControls) {
