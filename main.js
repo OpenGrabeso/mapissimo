@@ -212,9 +212,15 @@ function adjustDpi(map, steps) {
     newDpi = Math.min(newDpi, maxDpi);
     dpi = newDpi;
     setDPI(dpiText);
-    updatePreview(map, );
+    updatePreview(map);
 }
 
+function landscapeDim() {
+    return {x: a4height(), y: a4width()};
+}
+function portraitDim() {
+    return {x: a4width(), y: a4height()};
+}
 
 L.Map.mergeOptions({
     exportControl: true
@@ -227,12 +233,12 @@ L.Map.addInitHook(function () {
         var createControls = [
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Window", saveFun())},
-                function(map){return createButtonControl(map, "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}}))},
-                function(map){return createButtonControl(map, "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}}))},
+                function(map){return createButtonControl(map, "A4 Landscape", saveFun(landscapeDim))},
+                function(map){return createButtonControl(map, "A4 Portrait", saveFun(portraitDim))},
                 ]),
             createControlGroup("bottomleft", [
-                function(map){return createButtonControl(map, "A4 Landscape Preview", function(map){selectPreviewFun(map, function (){return {x: a4height(), y: a4width()}})})},
-                function(map){return createButtonControl(map, "A4 Portrait Preview", function(map){selectPreviewFun(map, function (){return {x: a4width(), y: a4height()}})})},
+                function(map){return createButtonControl(map, "A4 Landscape Preview", function(map){selectPreviewFun(map, landscapeDim)})},
+                function(map){return createButtonControl(map, "A4 Portrait Preview", function(map){selectPreviewFun(map, portraitDim)})},
             ]),
             createControlGroup(
                 "bottomleft", [
