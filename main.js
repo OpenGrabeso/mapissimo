@@ -162,13 +162,23 @@ function saveFun(dim) {
     };
 }
 
+var previewDimFun;
+
+function selectPreviewFun(map, dim) {
+    previewDimFun = previewFun(dim);
+    updatePreview(map);
+}
+
+function updatePreview(map) {
+    if (previewDimFun) {
+        previewDimFun(map);
+    }
+}
+
 function previewFun(dim) {
     return function(map) {
 
         var maxPreviewRenderSize = 800;
-        var spinner = L.DomUtil.create('div', 'loader');
-        previewDiv.innerHTML = "";
-        previewDiv.appendChild(spinner);
 
         var d = dim();
         var dx = d.x;
@@ -196,12 +206,13 @@ function previewFun(dim) {
     };
 }
 
-function adjustDpi(steps) {
+function adjustDpi(map, steps) {
     var newDpi = dpi + dpiStep * steps;
     newDpi = Math.max(newDpi, minDpi);
     newDpi = Math.min(newDpi, maxDpi);
     dpi = newDpi;
     setDPI(dpiText);
+    updatePreview(map, );
 }
 
 
@@ -220,14 +231,14 @@ L.Map.addInitHook(function () {
                 function(map){return createButtonControl(map, "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}}))},
                 ]),
             createControlGroup("bottomleft", [
-                function(map){return createButtonControl(map, "A4 Landscape Preview", previewFun(function(){return {x: a4height(), y: a4width()}}))},
-                function(map){return createButtonControl(map, "A4 Portrait Preview", previewFun(function(){return {x: a4width(), y: a4height()}}))},
+                function(map){return createButtonControl(map, "A4 Landscape Preview", function(map){selectPreviewFun(map, function (){return {x: a4height(), y: a4width()}})})},
+                function(map){return createButtonControl(map, "A4 Portrait Preview", function(map){selectPreviewFun(map, function (){return {x: a4width(), y: a4height()}})})},
             ]),
             createControlGroup(
                 "bottomleft", [
-                    function(map){return createButtonControl(map, "+", function(){adjustDpi(+1)})},
+                    function(map){return createButtonControl(map, "+", function(map){adjustDpi(map, +1)})},
                     function(map){return createTextControl(function(x){dpiText = x})},
-                    function(map){return createButtonControl(map, "-", function(){adjustDpi(-1)})},
+                    function(map){return createButtonControl(map, "-", function(map){adjustDpi(map, -1)})},
                 ],
             ),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
