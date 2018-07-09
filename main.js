@@ -157,6 +157,66 @@ function saveFun(dim) {
     };
 }
 
+function previewFun(dim) {
+    return function(map) {
+
+        var maxPreviewRenderSize = 800;
+        var spinner = L.DomUtil.create('div', 'loader');
+        imageDiv.innerHTML = "";
+        imageDiv.appendChild(spinner);
+
+        var d = dim();
+        var dx = d.x;
+        var dy = d.y;
+        var zoom = map.getZoom();
+        while (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize) {
+            zoom -= 1;
+            dx /= 2;
+            dy /= 2;
+        }
+        var mapContainer = L.DomUtil.create('div', 'preview-map');
+        mapContainer.style.position = "fixed";
+        mapContainer.style.width = dx + "px";
+        mapContainer.style.height = dy + "px";
+        mapContainer.style.left = "-" + mapContainer.style.width;
+        //mapContainer.style.display = "none";
+        mapDiv.innerHTML = '';
+        mapDiv.appendChild(mapContainer);
+        var renderMap = L.map(mapContainer, {
+            preferCanvas: true,
+            attributionControl: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            exportControl: false
+        });
+        var layerDef = mapLayers[0];
+        mymap.eachLayer(function(l) {
+            //try to find URL
+            for (var mi = 0; mi < mapLayers.length; mi ++) {
+                if (mapLayers[mi].url === l._url) {
+                    layerDef = mapLayers[mi];
+                    break;
+                }
+            }
+        });
+        var layer = tileLayer(layerDef);
+        layer.addTo(renderMap);
+        renderMap.setView(map.getCenter(), zoom);
+
+        leafletImage(renderMap, function(err, canvas) {
+            // now you have canvas
+            var img = document.createElement('img');
+            img.width = dx / 2;
+            img.height = dy / 2;
+            img.className = "image_output";
+            img.src = canvas.toDataURL();
+            imageDiv.innerHTML = '';
+            imageDiv.appendChild(img);
+            mapDiv.innerHTML = '';
+        }, dim);
+    };
+}
+
 function adjustDpi(steps) {
     var newDpi = dpi + dpiStep * steps;
     newDpi = Math.max(newDpi, minDpi);
@@ -180,6 +240,10 @@ L.Map.addInitHook(function () {
                 function(map){return createButtonControl(map, "A4 Landscape", saveFun(function(){return {x: a4height(), y: a4width()}}))},
                 function(map){return createButtonControl(map, "A4 Portrait", saveFun(function(){return {x: a4width(), y: a4height()}}))},
                 ]),
+            createControlGroup("bottomleft", [
+                function(map){return createButtonControl(map, "A4 Landscape Preview", previewFun(function(){return {x: a4height(), y: a4width()}}))},
+                function(map){return createButtonControl(map, "A4 Portrait Preview", previewFun(function(){return {x: a4width(), y: a4height()}}))},
+            ]),
             createControlGroup(
                 "bottomleft", [
                     function(map){return createButtonControl(map, "+", function(){adjustDpi(+1)})},
