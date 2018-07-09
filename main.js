@@ -165,45 +165,43 @@ function saveFun(dim) {
 var previewDimFun;
 
 function selectPreviewFun(map, dim) {
-    previewDimFun = previewFun(dim);
+    previewDimFun = dim;
+
     updatePreview(map);
 }
 
 function updatePreview(map) {
     if (previewDimFun) {
-        previewDimFun(map);
+        previewFun(map, previewDimFun);
     }
 }
 
-function previewFun(dim) {
-    return function(map) {
+function previewFun(map, dim) {
+    var maxPreviewRenderSize = 800;
 
-        var maxPreviewRenderSize = 800;
+    var d = dim();
+    var dx = d.x;
+    var dy = d.y;
+    var zoom = map.getZoom();
+    while (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize) {
+        zoom -= 1;
+        dx /= 2;
+        dy /= 2;
+    }
 
-        var d = dim();
-        var dx = d.x;
-        var dy = d.y;
-        var zoom = map.getZoom();
-        while (dx > maxPreviewRenderSize || dy > maxPreviewRenderSize) {
-            zoom -= 1;
-            dx /= 2;
-            dy /= 2;
-        }
+    var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
 
-        var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
-
-        leafletImage(renderMap, function(err, canvas) {
-            // now you have canvas
-            var img = document.createElement('img');
-            img.width = dx / 2;
-            img.height = dy / 2;
-            img.className = "image_output";
-            img.src = canvas.toDataURL();
-            previewDiv.innerHTML = '';
-            previewDiv.appendChild(img);
-            mapDiv.innerHTML = '';
-        }, dim);
-    };
+    leafletImage(renderMap, function(err, canvas) {
+        // now you have canvas
+        var img = document.createElement('img');
+        img.width = dx / 2;
+        img.height = dy / 2;
+        img.className = "image_output";
+        img.src = canvas.toDataURL();
+        previewDiv.innerHTML = '';
+        previewDiv.appendChild(img);
+        mapDiv.innerHTML = '';
+    }, dim);
 }
 
 function adjustDpi(map, steps) {
