@@ -30,13 +30,10 @@ function generateMapLayers(token){
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        {type: "routesheat", name: "Tracks&Routes+Heatmap",
-            url: "https://api.mapbox.com/styles/v1/ospanel/cjkbfwccz11972rmt4xvmvme6/tiles/256/{z}/{x}/{y}?access_token=" + token,
+        {type: "routes", name: "Tracks&Routes(Cz)",
+            url: "https://api.mapbox.com/styles/v1/ospanel/cjnaoar1056vm2suvyprucwe3/tiles/256/{z}/{x}/{y}?access_token=" + token,
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
-            overlay:
-                {url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", opacity: 0.6, transparency: 'true', attribution: stravaAttr}}
         },
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
