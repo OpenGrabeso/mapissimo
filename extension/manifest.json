@@ -25,7 +25,6 @@
   ],
   "web_accessible_resources": [
     "mapbox-gl.js",
-    "mapbox-gl.css",
     "leaflet-mapbox-gl.js",
     "fix.js",
     "leaflet.grid.js",
