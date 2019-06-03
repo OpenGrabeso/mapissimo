@@ -102,13 +102,40 @@ function createText(pos, getter, store) {
     };
 }
 
-function createMapRender(name, dx, dy, pos, zoom) {
+function selectedLayerDef(map) {
+    var layerDef = mapLayers[0];
+    var found = false;
+    map.eachLayer(function(l) {
+        //try to find URL
+        if (!found) {
+            for (var mi = 0; mi < mapLayers.length; mi++) {
+                if (mapLayers[mi].url === l._url) {
+                    layerDef = mapLayers[mi];
+                    found = true;
+                    break;
+                }
+            }
+        }
+    });
+    return layerDef;
+}
+
+function createMapRenderContainer(name, dx, dy, hide) {
     var mapContainer = L.DomUtil.create('div', name);
-    mapContainer.style.position = "fixed";
     mapContainer.style.width = dx + "px";
     mapContainer.style.height = dy + "px";
-    mapContainer.style.left = "-" + mapContainer.style.width;
+    if (hide) {
+        mapContainer.style.position = "fixed";
+        mapContainer.style.left = "-" + mapContainer.style.width;
+    } else {
+
+    }
     //mapContainer.style.display = "none";
+    return mapContainer;
+}
+
+function createMapRender(map, name, dx, dy, pos, zoom) {
+    var mapContainer = createMapRenderContainer(name, dx, dy, true);
     mapDiv.innerHTML = '';
     mapDiv.appendChild(mapContainer);
     var renderMap = L.map(mapContainer, {
@@ -118,16 +145,7 @@ function createMapRender(name, dx, dy, pos, zoom) {
         scrollWheelZoom: false,
         exportControl: false
     });
-    var layerDef = mapLayers[0];
-    mymap.eachLayer(function(l) {
-        //try to find URL
-        for (var mi = 0; mi < mapLayers.length; mi ++) {
-            if (mapLayers[mi].url === l._url) {
-                layerDef = mapLayers[mi];
-                break;
-            }
-        }
-    });
+    var layerDef = selectedLayerDef(map);
     var layer = tileLayer(layerDef);
     layer.addTo(renderMap);
     renderMap.setView(pos, zoom);
@@ -151,31 +169,74 @@ function currentMapDim() {
     return mymap.getSize();
 }
 
-function saveFun(map) {
+var printedMap;
+
+function saveFunGL(map, layerDef) {
     var dim = previewDimFun;
-    var renderMap;
-    var spinner = L.DomUtil.create('div', 'loader');
-    imageDiv.innerHTML = "";
-    imageDiv.appendChild(spinner);
-    if (dim) {
-        var d = dim();
-        renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
+    if (!dim) return; // MapBox print not supported without dimensions
+    var d = dim();
+    var container = createMapRenderContainer('render-map', d.x, d.y);
+
+    var center = map.getCenter();
+    var centerGL = [center.lng, center.lat];
+
+    var renderMapGL = new mapboxgl.Map({
+        container: container,
+        center: centerGL,
+        style: layerDef.style,
+        bearing: 0,
+        maxZoom: 24,
+        zoom: map.getZoom() - 1,
+        pitch: 0,
+        interactive: false,
+        attributionControl: false,
+        preserveDrawingBuffer: true
+    });
+
+    if (printedMap) {
+        printedMap.remove();
     }
-    var aMap = dim ? renderMap : map;
-    leafletImage(aMap, function(err, canvas) {
-        var d = dim ? dim : currentMapDim;
-        var ps = previewSize(d(), map.getZoom());
-        // now you have canvas
-        var img = document.createElement('img');
-        var dimensions = aMap.getSize();
-        img.width = ps.dx / 2;
-        img.height = ps.dy / 2;
-        img.className = "image_output";
-        img.src = canvas.toDataURL();
-        imageDiv.innerHTML = '';
-        imageDiv.appendChild(img);
-        mapDiv.innerHTML = '';
-    }, dim);
+
+    imageDiv.innerHTML = '';
+    imageDiv.appendChild(container);
+    //var renderListener = function () {};
+    //renderMapGL.on('render', renderListener);
+    printedMap = renderMapGL;
+
+}
+
+function saveFun(map) {
+    // different handling needed for Mapbox GL
+    var layerDef = selectedLayerDef(map);
+    if (layerDef.style) {
+        saveFunGL(map, layerDef);
+    } else {
+
+        var dim = previewDimFun;
+        var renderMap;
+        var spinner = L.DomUtil.create('div', 'loader');
+        imageDiv.innerHTML = "";
+        imageDiv.appendChild(spinner);
+        if (dim) {
+            var d = dim();
+            renderMap = createMapRender(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom())
+        }
+        var aMap = dim ? renderMap : map;
+        leafletImage(aMap, function (err, canvas) {
+            var d = dim ? dim : currentMapDim;
+            var ps = previewSize(d(), map.getZoom());
+            // now you have canvas
+            var img = document.createElement('img');
+            var dimensions = aMap.getSize();
+            img.width = ps.dx / 2;
+            img.height = ps.dy / 2;
+            img.className = "image_output";
+            img.src = canvas.toDataURL();
+            imageDiv.innerHTML = '';
+            imageDiv.appendChild(img);
+            mapDiv.innerHTML = '';
+        }, dim);
+    }
 }
 
 function selectPreviewFun(map, dim) {
@@ -192,6 +253,9 @@ function updatePreview(map) {
     }
 }
 
+var previewMap;
+var previewDX, previewDY;
+
 function previewFun(map, dim) {
 
     var ps = previewSize(dim(), map.getZoom());
@@ -200,19 +264,79 @@ function previewFun(map, dim) {
     var dy = ps.dy;
     var zoom = ps.zoom;
 
-    var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
+    var layerDef = selectedLayerDef(map);
+    if (layerDef.style) {
 
-    leafletImage(renderMap, function(err, canvas) {
-        // now you have canvas
-        var img = document.createElement('img');
-        img.width = dx / 2;
-        img.height = dy / 2;
-        img.className = "image_output";
-        img.src = canvas.toDataURL();
-        previewDiv.innerHTML = '';
-        previewDiv.appendChild(img);
+        dx /= 2;
+        dy /= 2;
+
+        var container = createMapRenderContainer('preview-map', dx, dy);
+
+        var center = map.getCenter();
+        var centerGL = [center.lng, center.lat];
+
+        var bounds = map.getBounds();
+        var boundsGL = [
+            [bounds._southWest.lng, bounds._southWest.lat],
+            [bounds._northEast.lng, bounds._northEast.lat]
+        ];
+        if (dx !== previewDX || dy !== previewDY || previewStyle !== layerDef.style) {
+            var renderMapGL = new mapboxgl.Map({
+                container: container,
+                style: layerDef.style,
+                bearing: 0,
+                maxZoom: 24,
+                center: centerGL,
+                zoom: map.getZoom() - 3,
+                bounds: boundsGL, // TODO: fix initial bounds not used
+                pitch: 0,
+                interactive: false,
+                attributionControl: false,
+                preserveDrawingBuffer: true
+            });
+            renderMapGL.fitBounds(boundsGL);
+            var handler = function () {
+                renderMapGL.resize();
+                renderMapGL.fitBounds(boundsGL, {animate: false});
+                renderMapGL.off('render', handler);
+            };
+            renderMapGL.on('render', handler);
+            if (previewMap) {
+                previewMap.remove();
+            }
+            previewMap = renderMapGL;
+            previewDiv.innerHTML = "";
+            previewDiv.appendChild(container);
+            previewDX = dx;
+            previewDY = dy;
+            previewStyle = layerDef.style;
+        } else {
+            // move only, no need to resize
+            previewMap.fitBounds(boundsGL, {animate: false});
+        }
+
         mapDiv.innerHTML = '';
-    }, dim);
+    } else {
+        var renderMap = createMapRender(map,'preview-map', dx, dy, map.getCenter(), zoom);
+
+        leafletImage(renderMap, function (err, canvas) {
+            // now you have canvas
+            var img = document.createElement('img');
+            img.width = dx / 2;
+            img.height = dy / 2;
+            img.className = "image_output";
+            img.src = canvas.toDataURL();
+
+            if (previewMap) {
+                previewMap.remove();
+            }
+            previewMap = renderMap;
+
+            previewDiv.innerHTML = '';
+            previewDiv.appendChild(img);
+            mapDiv.innerHTML = '';
+        }, dim);
+    }
 }
 
 function adjustDpi(map, steps) {
