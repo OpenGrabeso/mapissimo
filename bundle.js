@@ -320,6 +320,7 @@ function previewFun(map, dim) {
                 preserveDrawingBuffer: true
             });
             renderMapGL.fitBounds(boundsGL);
+            
             var handler = function () {
                 renderMapGL.resize();
                 renderMapGL.fitBounds(boundsGL, {animate: false});
