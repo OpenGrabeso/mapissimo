@@ -20,3 +20,7 @@ Adds additional maps to Strava.com:
 ## Installation
 
  - [Chrome Web Store](https://chrome.google.com/webstore/detail/mapissimo/pepbnlfbmhnpgaoojfoclhbkbefbnkag)
+
+## Styles
+
+The Styles folder contains the JSON representation of the styles used.
