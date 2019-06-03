@@ -175,6 +175,11 @@ function saveFunGL(map, layerDef) {
     var dim = previewDimFun;
     if (!dim) return; // MapBox print not supported without dimensions
     var d = dim();
+    var spinner = L.DomUtil.create('div', 'loader');
+    imageDiv.innerHTML = "";
+    imageDiv.appendChild(spinner);
+
+
     var container = createMapRenderContainer('render-map', d.x, d.y);
 
     var center = map.getCenter();
@@ -197,10 +202,30 @@ function saveFunGL(map, layerDef) {
         printedMap.remove();
     }
 
-    imageDiv.innerHTML = '';
-    imageDiv.appendChild(container);
-    //var renderListener = function () {};
-    //renderMapGL.on('render', renderListener);
+    var handler =  function () {
+        renderMapGL.off('render', handler);
+        renderMapGL.resize();
+    };
+    var loadHandler =  function () {
+        renderMapGL.resize();
+        var canvas = renderMapGL.getCanvas();
+        imageDiv.innerHTML = '';
+        imageDiv.appendChild(container);
+
+        var img = document.createElement('img');
+        img.width = d.x / 2;
+        img.height = d.y / 2;
+        img.className = "image_output";
+        img.src = canvas.toDataURL();
+        imageDiv.innerHTML = '';
+        imageDiv.appendChild(img);
+        mapDiv.innerHTML = '';
+        renderMapGL.off('load', loadHandler);
+    };
+
+    renderMapGL.on('render', handler);
+    renderMapGL.on('load', loadHandler);
+
     printedMap = renderMapGL;
 
 }

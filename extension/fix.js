@@ -13,8 +13,17 @@
 var FixScript = document.currentScript;
 jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 	function tileLayer(l) {
-        var r = L.tileLayer(l.url, l.opts);
+        var r;
+        if (l.style) {
+            r = L.mapboxGL({
+                accessToken: l.token,
+                style: l.style
+            });
+        } else {
+            r = L.tileLayer(l.url, l.opts);
+        }
         if (l.overlay) {
+
             var o = L.tileLayer(l.overlay.url, l.overlay.opts);
             if (l.grid) {
                 r = L.layerGroup([r, o, L.grid()]);

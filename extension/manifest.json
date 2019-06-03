@@ -1,6 +1,6 @@
 {
   "name": "Mapissimo",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "manifest_version": 2,
   "description": "Map switcher for Strava website",
   "homepage_url": "https://github.com/OpenGrabeso/mapissimo",
@@ -14,9 +14,15 @@
       "matches": [
         "https://www.strava.com/*"
       ],
+      "css": [
+        "mapbox-gl.css"
+      ],
       "js": [
+        "ping.js",
         "arrive.min.js",
-        "inject.js"
+        "inject.js",
+        "mapbox-gl.js",
+        "leaflet-mapbox-gl.js"
       ]
     }
   ],

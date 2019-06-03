@@ -45,6 +45,10 @@ html, body {
     border: #0000ff 2px solid;
 }
 
+.preview-map {
+    border: #0000ff 2px solid;
+}
+
 .loader {
     border: 10px solid #CCC; /* Light grey */
     border-top: 10px solid #3AE; /* Blue */

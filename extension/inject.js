@@ -28,11 +28,12 @@
 
 	function inject() {
 		document.arrive(".leaflet-container", {onceOnly: false, existing: true}, function(){
-			var s = document.createElement("script");
+            var s = document.createElement("script");
 			s.src = getURL('fix.js');
 			s.type = 'text/javascript';
 			s.dataset.layersUrl = getURL('layers.js');
 			document.body.appendChild(s);
+
             s = document.createElement("script");
             s.src = getURL('leaflet.grid.js');
             s.type = 'text/javascript';

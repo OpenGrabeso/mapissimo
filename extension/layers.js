@@ -23,6 +23,7 @@ function generateMapLayers(token){
         {type: "tracksgl", name: "Tracks&Routes (GL)",
             // NG style - cjh226q3j0rtd2roxwnwlwy13
             style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
+            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
