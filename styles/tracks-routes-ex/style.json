@@ -1,6 +1,6 @@
 {
     "version": 8,
-    "name": "(migrated) Tracks-Routes-Ex",
+    "name": "(migrated) Tracks-Routes",
     "metadata": {
         "mapbox:autocomposite": true,
         "mapbox:type": "default",
@@ -46,6 +46,10 @@
                 "name": "Country labels",
                 "collapsed": false
             },
+            "1f6c9051f308d31107a96524938f8ef4": {
+                "name": "Routes (minor)",
+                "collapsed": false
+            },
             "1444933456003.5437": {
                 "name": "POI labels (scalerank 4)",
                 "collapsed": false
@@ -62,7 +66,7 @@
         }
     },
     "center": [0, 2.842170943040401e-14],
-    "zoom": 13.099006711927426,
+    "zoom": 13.904998291828035,
     "bearing": 0,
     "pitch": 0,
     "sources": {
@@ -71,7 +75,7 @@
             "type": "vector"
         }
     },
-    "sprite": "mapbox://sprites/ospanel/cjwgt36lq0nxt1cnkk0pjvk42/6a2tqsk9pf54dv372rv1vp5ty",
+    "sprite": "mapbox://sprites/ospanel/cjwgsxmgq30pb1co8varxwv1j/6a2tqsk9pf54dv372rv1vp5ty",
     "glyphs": "mapbox://fonts/ospanel/{fontstack}/{range}.pbf",
     "layers": [
         {
@@ -4135,8 +4139,7 @@
                     15,
                     3
                 ],
-                "line-color": "hsl(0, 100%, 70%)",
-                "line-dasharray": [6, 3, 2, 3]
+                "line-color": "hsl(0, 100%, 70%)"
             }
         },
         {
@@ -4294,15 +4297,6 @@
                     1,
                     15,
                     3
-                ],
-                "line-color": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    0,
-                    "hsl(0, 0%, 13%)",
-                    22,
-                    "#222"
                 ],
                 "line-dasharray": [8, 2]
             }
@@ -7358,7 +7352,7 @@
         {
             "id": "route-hiking-default",
             "type": "line",
-            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
             "source": "composite",
             "source-layer": "relations",
             "minzoom": 10,
@@ -7368,7 +7362,13 @@
                 [
                     "all",
                     ["match", ["get", "network"], ["lwn"], false, true],
-                    ["!", ["has", "color"]],
+                    [
+                        "match",
+                        ["get", "color"],
+                        ["blue", "green", "red", "yellow"],
+                        false,
+                        true
+                    ],
                     ["match", ["get", "route"], ["foot", "hiking"], true, false]
                 ]
             ],
@@ -7398,6 +7398,498 @@
                     0,
                     13,
                     1,
+                    15,
+                    4
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    10,
+                    0,
+                    11,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-blue-local",
+            "type": "line",
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "color"], ["blue"], true, false],
+                    ["match", ["get", "local"], ["yes"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "line-color": "hsl(236, 87%, 51%)",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12,
+                    2,
+                    15,
+                    6
+                ],
+                "line-dasharray": [1, 1, 3, 1],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    11,
+                    0,
+                    12,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-green-local",
+            "type": "line",
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "color"], ["green"], true, false],
+                    ["match", ["get", "local"], ["yes"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "line-color": "hsl(101, 73%, 32%)",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12,
+                    2,
+                    15,
+                    6
+                ],
+                "line-dasharray": [1, 1, 3, 1],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    11,
+                    0,
+                    12,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-yellow-local",
+            "type": "line",
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "color"], ["yellow"], true, false],
+                    ["match", ["get", "local"], ["yes"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "line-color": "hsl(55, 100%, 39%)",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12,
+                    2,
+                    15,
+                    6
+                ],
+                "line-dasharray": [1, 1, 3, 1],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    11,
+                    0,
+                    12,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-red-local",
+            "type": "line",
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "color"], ["red"], true, false],
+                    ["match", ["get", "local"], ["yes"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {"visibility": "visible"},
+            "paint": {
+                "line-color": "#ea1f1f",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12,
+                    2,
+                    15,
+                    6
+                ],
+                "line-dasharray": [1, 1, 3, 1],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    11,
+                    0,
+                    12,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-local",
+            "type": "line",
+            "metadata": {"mapbox:group": "1f6c9051f308d31107a96524938f8ef4"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    [
+                        "match",
+                        ["get", "color"],
+                        ["blue", "green", "red", "yellow"],
+                        false,
+                        true
+                    ],
+                    ["match", ["get", "network"], ["lwn"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {
+                "visibility": "visible",
+                "line-join": "round",
+                "line-round-limit": 4
+            },
+            "paint": {
+                "line-color": "#c16",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2,
+                    14,
+                    4
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12,
+                    2,
+                    15,
+                    6
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    10,
+                    0,
+                    11,
+                    1
+                ],
+                "line-dasharray": [1, 1, 3, 1]
+            }
+        },
+        {
+            "id": "route-hiking-blue",
+            "type": "line",
+            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 10,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "local"], ["yes"], false, true],
+                    ["match", ["get", "color"], ["blue"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {
+                "visibility": "visible",
+                "line-miter-limit": 4,
+                "line-join": "round",
+                "line-round-limit": 4,
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "#22f",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2,
+                    14,
+                    4
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12.5,
+                    0,
+                    13,
+                    2,
+                    15,
+                    4
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    10,
+                    0,
+                    11,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-green",
+            "type": "line",
+            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 10,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "local"], ["yes"], false, true],
+                    ["match", ["get", "color"], ["green"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {
+                "visibility": "visible",
+                "line-join": "round",
+                "line-round-limit": 4
+            },
+            "paint": {
+                "line-color": "#4a2",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2,
+                    14,
+                    4
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12.5,
+                    0,
+                    13,
+                    2,
+                    15,
+                    4
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    10,
+                    0,
+                    11,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-yellow",
+            "type": "line",
+            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 10,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "local"], ["yes"], false, true],
+                    ["match", ["get", "color"], ["yellow"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {
+                "visibility": "visible",
+                "line-join": "round",
+                "line-round-limit": 4
+            },
+            "paint": {
+                "line-color": "#ed0",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2,
+                    14,
+                    4
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12.5,
+                    0,
+                    13,
+                    2,
+                    15,
+                    4
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    10,
+                    0,
+                    11,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "route-hiking-red",
+            "type": "line",
+            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
+            "source": "composite",
+            "source-layer": "relations",
+            "minzoom": 10,
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    ["match", ["get", "local"], ["yes"], false, true],
+                    ["match", ["get", "color"], ["red"], true, false],
+                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
+                ]
+            ],
+            "layout": {
+                "visibility": "visible",
+                "line-join": "round",
+                "line-round-limit": 4
+            },
+            "paint": {
+                "line-color": "#c41",
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    10,
+                    1,
+                    13,
+                    2,
+                    14,
+                    4
+                ],
+                "line-offset": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    12.5,
+                    0,
+                    13,
+                    2,
                     15,
                     4
                 ],
@@ -7452,136 +7944,6 @@
             "paint": {}
         },
         {
-            "id": "route-hiking-colored-local",
-            "type": "line",
-            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
-            "source": "composite",
-            "source-layer": "relations",
-            "minzoom": 12,
-            "filter": [
-                "all",
-                ["match", ["geometry-type"], ["LineString"], true, false],
-                [
-                    "all",
-                    ["match", ["get", "local"], ["yes"], true, false],
-                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
-                ]
-            ],
-            "layout": {"visibility": "visible"},
-            "paint": {
-                "line-color": [
-                    "match",
-                    ["get", "color"],
-                    "green",
-                    "#3c8d16",
-                    "red",
-                    "#c41",
-                    "yellow",
-                    "#ed0",
-                    "blue",
-                    "#22f",
-                    "#cb1064"
-                ],
-                "line-width": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    10,
-                    1,
-                    13,
-                    2
-                ],
-                "line-offset": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    12,
-                    2,
-                    15,
-                    6
-                ],
-                "line-dasharray": [1, 1, 3, 1],
-                "line-opacity": [
-                    "interpolate",
-                    ["exponential", 1],
-                    ["zoom"],
-                    11,
-                    0,
-                    12,
-                    1
-                ]
-            }
-        },
-        {
-            "id": "route-hiking-colored",
-            "type": "line",
-            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
-            "source": "composite",
-            "source-layer": "relations",
-            "minzoom": 10,
-            "filter": [
-                "all",
-                ["match", ["geometry-type"], ["LineString"], true, false],
-                [
-                    "all",
-                    ["match", ["get", "local"], ["yes"], false, true],
-                    ["has", "color"],
-                    ["match", ["get", "route"], ["foot", "hiking"], true, false]
-                ]
-            ],
-            "layout": {
-                "visibility": "visible",
-                "line-join": "round",
-                "line-round-limit": 4
-            },
-            "paint": {
-                "line-color": [
-                    "match",
-                    ["get", "color"],
-                    "green",
-                    "#3c8d16",
-                    "red",
-                    "#c41",
-                    "yellow",
-                    "#ed0",
-                    "blue",
-                    "#22f",
-                    "#cb1064"
-                ],
-                "line-width": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    10,
-                    1,
-                    13,
-                    2,
-                    14,
-                    4
-                ],
-                "line-offset": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    12.5,
-                    0,
-                    13,
-                    2,
-                    15,
-                    4
-                ],
-                "line-opacity": [
-                    "interpolate",
-                    ["exponential", 1],
-                    ["zoom"],
-                    10,
-                    0,
-                    11,
-                    1
-                ]
-            }
-        },
-        {
             "id": "route-hiking ferrata",
             "type": "line",
             "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
@@ -7627,19 +7989,7 @@
             ],
             "layout": {"visibility": "visible", "line-cap": "square"},
             "paint": {
-                "line-color": [
-                    "match",
-                    ["get", "color"],
-                    "green",
-                    "#3c8d16",
-                    "red",
-                    "#c41",
-                    "yellow",
-                    "#ed0",
-                    "blue",
-                    "#22f",
-                    "#cb1064"
-                ],
+                "line-color": "#c520c3",
                 "line-width": [
                     "interpolate",
                     ["exponential", 1.5],
@@ -7673,7 +8023,7 @@
             }
         },
         {
-            "id": "route-cycling-default",
+            "id": "route-cycling",
             "type": "line",
             "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
             "source": "composite",
@@ -7682,78 +8032,11 @@
             "filter": [
                 "all",
                 ["match", ["geometry-type"], ["LineString"], true, false],
-                [
-                    "all",
-                    ["!", ["has", "color"]],
-                    ["match", ["get", "route"], ["bicycle", "mtb"], true, false]
-                ]
+                ["match", ["get", "route"], ["bicycle", "mtb"], true, false]
             ],
             "layout": {"visibility": "visible"},
             "paint": {
                 "line-color": "hsl(301, 72%, 45%)",
-                "line-width": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    10,
-                    1,
-                    13,
-                    2,
-                    14,
-                    3
-                ],
-                "line-offset": [
-                    "interpolate",
-                    ["exponential", 1.5],
-                    ["zoom"],
-                    12,
-                    -1,
-                    15,
-                    -3
-                ],
-                "line-dasharray": [3, 2],
-                "line-opacity": [
-                    "interpolate",
-                    ["exponential", 1],
-                    ["zoom"],
-                    9,
-                    0,
-                    10.5,
-                    1
-                ]
-            }
-        },
-        {
-            "id": "route-cycling-colored",
-            "type": "line",
-            "metadata": {"mapbox:group": "6502467875950a2c83ab66ef175ba8d5"},
-            "source": "composite",
-            "source-layer": "relations",
-            "minzoom": 9,
-            "filter": [
-                "all",
-                ["match", ["geometry-type"], ["LineString"], true, false],
-                [
-                    "all",
-                    ["has", "color"],
-                    ["match", ["get", "route"], ["bicycle", "mtb"], true, false]
-                ]
-            ],
-            "layout": {"visibility": "visible"},
-            "paint": {
-                "line-color": [
-                    "match",
-                    ["get", "color"],
-                    "green",
-                    "#3c8d16",
-                    "red",
-                    "#c41",
-                    "yellow",
-                    "#ed0",
-                    "blue",
-                    "#22f",
-                    "#cb1064"
-                ],
                 "line-width": [
                     "interpolate",
                     ["exponential", 1.5],
@@ -7852,9 +8135,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     12,
-                    10,
                     14,
-                    18
+                    14,
+                    24
                 ],
                 "icon-image": ["step", ["zoom"], "dot-9", 15, "dot-11"],
                 "text-anchor": "top",
@@ -8051,9 +8334,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     13,
-                    12,
+                    18,
                     14,
-                    15
+                    20
                 ],
                 "text-max-angle": 25,
                 "text-font": [
@@ -8186,11 +8469,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    12,
                     20,
-                    13
+                    14
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -8280,11 +8563,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -8351,11 +8634,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -8421,11 +8704,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -8491,11 +8774,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -8550,7 +8833,7 @@
                     "Arial Unicode MS Regular"
                 ],
                 "text-field": ["to-string", ["get", "name"]],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-15"],
+                "icon-image": ["concat", ["get", "maki"], "-15"],
                 "text-anchor": "top",
                 "text-offset": [0, 0.65]
             },
@@ -8567,28 +8850,24 @@
                 "all",
                 ["match", ["geometry-type"], ["LineString"], true, false],
                 [
-                    "all",
+                    "match",
+                    ["get", "class"],
                     [
-                        "match",
-                        ["get", "class"],
-                        [
-                            "aerialway",
-                            "golf",
-                            "link",
-                            "motorway",
-                            "path",
-                            "pedestrian",
-                            "primary",
-                            "secondary",
-                            "street",
-                            "street_limited",
-                            "tertiary",
-                            "trunk"
-                        ],
-                        false,
-                        true
+                        "aerialway",
+                        "golf",
+                        "link",
+                        "motorway",
+                        "path",
+                        "pedestrian",
+                        "primary",
+                        "secondary",
+                        "street",
+                        "street_limited",
+                        "tertiary",
+                        "trunk"
                     ],
-                    ["has", "name"]
+                    false,
+                    true
                 ]
             ],
             "layout": {
@@ -8597,9 +8876,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     15,
-                    10,
+                    14,
                     16,
-                    13
+                    20
                 ],
                 "text-max-angle": 30,
                 "symbol-spacing": 250,
@@ -8611,7 +8890,7 @@
                 "text-padding": 1,
                 "text-rotation-alignment": "map",
                 "text-pitch-alignment": "viewport",
-                "text-field": ["to-string", ["get", "name"]],
+                "text-field": ["to-string", ["get", "name_en"]],
                 "text-letter-spacing": 0.01
             },
             "paint": {
@@ -8632,22 +8911,18 @@
                 "all",
                 ["match", ["geometry-type"], ["LineString"], true, false],
                 [
-                    "all",
-                    ["has", "name"],
+                    "match",
+                    ["get", "class"],
                     [
-                        "match",
-                        ["get", "class"],
-                        [
-                            "aerialway",
-                            "link",
-                            "path",
-                            "pedestrian",
-                            "street",
-                            "street_limited"
-                        ],
-                        true,
-                        false
-                    ]
+                        "aerialway",
+                        "link",
+                        "path",
+                        "pedestrian",
+                        "street",
+                        "street_limited"
+                    ],
+                    true,
+                    false
                 ]
             ],
             "layout": {
@@ -8656,9 +8931,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     11,
-                    10,
+                    14,
                     16,
-                    14
+                    20
                 ],
                 "text-max-angle": 30,
                 "symbol-spacing": 250,
@@ -8670,7 +8945,7 @@
                 "text-padding": 1,
                 "text-rotation-alignment": "map",
                 "text-pitch-alignment": "viewport",
-                "text-field": ["to-string", ["get", "name"]],
+                "text-field": ["to-string", ["get", "name_en"]],
                 "text-letter-spacing": 0.01
             },
             "paint": {
@@ -8704,21 +8979,11 @@
                     false
                 ],
                 [
-                    "all",
-                    ["has", "name_ar"],
-                    [
-                        "match",
-                        ["get", "class"],
-                        [
-                            "motorway",
-                            "primary",
-                            "secondary",
-                            "tertiary",
-                            "trunk"
-                        ],
-                        true,
-                        false
-                    ]
+                    "match",
+                    ["get", "class"],
+                    ["motorway", "primary", "secondary", "tertiary", "trunk"],
+                    true,
+                    false
                 ]
             ],
             "layout": {
@@ -8727,9 +8992,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     9,
-                    10,
+                    14,
                     16,
-                    16
+                    22
                 ],
                 "text-max-angle": 30,
                 "symbol-spacing": 250,
@@ -8741,7 +9006,7 @@
                 "text-padding": 1,
                 "text-rotation-alignment": "map",
                 "text-pitch-alignment": "viewport",
-                "text-field": ["to-string", ["get", "name"]],
+                "text-field": ["to-string", ["get", "name_en"]],
                 "text-letter-spacing": 0.01
             },
             "paint": {
@@ -8823,9 +9088,9 @@
                 "text-size": 9,
                 "icon-image": [
                     "concat",
-                    ["to-string", ["get", "shield"]],
+                    ["get", "shield"],
                     "-",
-                    ["to-string", ["get", "reflen"]]
+                    ["get", "reflen"]
                 ],
                 "icon-rotation-alignment": "viewport",
                 "text-max-angle": 38,
@@ -8925,12 +9190,12 @@
                 ]
             ],
             "layout": {
-                "text-size": 9,
+                "text-size": 10,
                 "icon-image": [
                     "concat",
-                    ["to-string", ["get", "shield"]],
+                    ["get", "shield"],
                     "-",
-                    ["to-string", ["get", "reflen"]]
+                    ["get", "reflen"]
                 ],
                 "icon-rotation-alignment": "viewport",
                 "text-max-angle": 38,
@@ -8947,6 +9212,7 @@
                 "symbol-placement": ["step", ["zoom"], "point", 11, "line"],
                 "text-padding": 2,
                 "text-rotation-alignment": "viewport",
+                "icon-size": 1,
                 "text-field": ["to-string", ["get", "ref"]],
                 "text-letter-spacing": 0.05,
                 "icon-padding": 2
@@ -8986,11 +9252,7 @@
             "layout": {
                 "text-field": ["to-string", ["get", "ref"]],
                 "text-size": 9,
-                "icon-image": [
-                    "concat",
-                    "motorway-exit-",
-                    ["to-string", ["get", "reflen"]]
-                ],
+                "icon-image": ["concat", "motorway-exit-", ["get", "reflen"]],
                 "text-font": ["DIN Offc Pro Bold", "Arial Unicode MS Bold"]
             },
             "paint": {
@@ -9034,11 +9296,11 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
-                "icon-image": ["concat", ["to-string", ["get", "maki"]], "-11"],
+                "icon-image": ["concat", ["get", "maki"], "-11"],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
                 "text-font": [
@@ -9095,9 +9357,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     16,
-                    11,
+                    14,
                     20,
-                    13
+                    20
                 ],
                 "icon-image": "spring-x",
                 "text-max-angle": 38,
@@ -9187,9 +9449,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     4,
-                    11,
+                    14,
                     18,
-                    14
+                    20
                 ],
                 "icon-image": "triangle-stroked-15",
                 "text-font": [
@@ -9201,9 +9463,9 @@
                 "text-anchor": "top",
                 "text-field": [
                     "concat",
-                    ["to-string", ["get", "name_en"]],
+                    ["get", "name_en"],
                     ", ",
-                    ["to-string", ["get", "elevation_m"]],
+                    ["get", "elevation_m"],
                     "m"
                 ],
                 "text-letter-spacing": 0.01,
@@ -9260,16 +9522,16 @@
                     ["exponential", 1],
                     ["zoom"],
                     14,
-                    11,
+                    14,
                     20,
-                    14
+                    20
                 ],
                 "icon-image": [
                     "step",
                     ["zoom"],
-                    ["concat", ["to-string", ["get", "maki"]], "-11"],
+                    ["concat", ["get", "maki"], "-11"],
                     15,
-                    ["concat", ["to-string", ["get", "maki"]], "-15"]
+                    ["concat", ["get", "maki"], "-15"]
                 ],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
@@ -9336,16 +9598,16 @@
                     ["exponential", 1],
                     ["zoom"],
                     14,
-                    11,
+                    14,
                     20,
-                    14
+                    20
                 ],
                 "icon-image": [
                     "step",
                     ["zoom"],
-                    ["concat", ["to-string", ["get", "maki"]], "-11"],
+                    ["concat", ["get", "maki"], "-11"],
                     15,
-                    ["concat", ["to-string", ["get", "maki"]], "-15"]
+                    ["concat", ["get", "maki"], "-15"]
                 ],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
@@ -9392,9 +9654,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     13,
-                    11,
+                    14,
                     15,
-                    16
+                    20
                 ],
                 "icon-image": ["to-string", ["get", "network"]],
                 "symbol-spacing": 250,
@@ -9547,16 +9809,16 @@
                     ["exponential", 1],
                     ["zoom"],
                     10,
-                    11,
+                    14,
                     18,
-                    14
+                    20
                 ],
                 "icon-image": [
                     "step",
                     ["zoom"],
-                    ["concat", ["to-string", ["get", "maki"]], "-11"],
+                    ["concat", ["get", "maki"], "-11"],
                     14,
-                    ["concat", ["to-string", ["get", "maki"]], "-15"]
+                    ["concat", ["get", "maki"], "-15"]
                 ],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
@@ -9623,16 +9885,16 @@
                     ["exponential", 1],
                     ["zoom"],
                     10,
-                    11,
+                    14,
                     18,
-                    14
+                    20
                 ],
                 "icon-image": [
                     "step",
                     ["zoom"],
-                    ["concat", ["to-string", ["get", "maki"]], "-11"],
+                    ["concat", ["get", "maki"], "-11"],
                     14,
-                    ["concat", ["to-string", ["get", "maki"]], "-15"]
+                    ["concat", ["get", "maki"], "-15"]
                 ],
                 "text-max-angle": 38,
                 "symbol-spacing": 250,
@@ -9686,9 +9948,9 @@
                 "icon-image": [
                     "step",
                     ["zoom"],
-                    ["concat", ["to-string", ["get", "maki"]], "-11"],
+                    ["concat", ["get", "maki"], "-11"],
                     13,
-                    ["concat", ["to-string", ["get", "maki"]], "-15"]
+                    ["concat", ["get", "maki"], "-15"]
                 ],
                 "symbol-spacing": 250,
                 "text-font": [
@@ -9874,7 +10136,8 @@
                     ]
                 ],
                 "text-anchor": "bottom",
-                "text-field": ["to-string", ["get", "name"]]
+                "text-field": ["to-string", ["get", "name"]],
+                "text-size": 18
             },
             "paint": {"text-color": "hsl(226, 69%, 36%)"}
         },
@@ -10191,9 +10454,9 @@
                     ["exponential", 1],
                     ["zoom"],
                     10,
-                    11.5,
+                    14,
                     16,
-                    36
+                    40
                 ]
             },
             "paint": {
@@ -11263,9 +11526,9 @@
             }
         }
     ],
-    "created": "2019-06-03T20:07:48.937Z",
-    "id": "cjwgt36lq0nxt1cnkk0pjvk42",
-    "modified": "2019-06-03T20:07:48.937Z",
+    "created": "2019-06-03T20:03:29.510Z",
+    "id": "cjwgsxmgq30pb1co8varxwv1j",
+    "modified": "2019-06-03T20:03:29.510Z",
     "owner": "ospanel",
     "visibility": "private",
     "draft": false
