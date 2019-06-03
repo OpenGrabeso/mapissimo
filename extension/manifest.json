@@ -18,7 +18,6 @@
         "mapbox-gl.css"
       ],
       "js": [
-        "ping.js",
         "arrive.min.js",
         "inject.js"
       ]

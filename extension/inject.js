@@ -45,17 +45,17 @@
                 s.onload = function() {
 
                     var s = document.createElement("script");
-                    s.src = getURL('fix.js');
+                    s.src = getURL('leaflet.grid.js');
                     s.type = 'text/javascript';
-                    s.dataset.layersUrl = getURL('layers.js');
-                    console.log("inject layers.js");
+                    console.log("inject leaflet.grid.js");
                     document.body.appendChild(s);
 
                     s.onload = function () {
                         var s = document.createElement("script");
-                        s.src = getURL('leaflet.grid.js');
+                        s.src = getURL('fix.js');
                         s.type = 'text/javascript';
-                        console.log("inject leaflet.grid.js");
+                        s.dataset.layersUrl = getURL('layers.js');
+                        console.log("inject layers.js");
                         document.body.appendChild(s);
                     }
                 }
