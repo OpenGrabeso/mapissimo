@@ -20,13 +20,13 @@
       "js": [
         "ping.js",
         "arrive.min.js",
-        "inject.js",
-        "mapbox-gl.js",
-        "leaflet-mapbox-gl.js"
+        "inject.js"
       ]
     }
   ],
   "web_accessible_resources": [
+    "mapbox-gl.js",
+    "leaflet-mapbox-gl.js",
     "fix.js",
     "leaflet.grid.js",
     "layers.js"
