@@ -151,6 +151,30 @@ function createMapRender(map, name, dx, dy, pos, zoom) {
     return renderMap;
 }
 
+function createMapRenderGL(map, name, dx, dy, pos, zoom) {
+    var mapContainer = createMapRenderContainer(name, dx, dy, true);
+    mapDiv.innerHTML = '';
+    mapDiv.appendChild(mapContainer);
+    var layerDef = selectedLayerDef(map);
+
+    var centerGL = [pos.lng, pos.lat];
+
+    var renderMap = new mapboxgl.Map({
+        container: mapContainer,
+        center: centerGL,
+        style: layerDef.style,
+        bearing: 0,
+        maxZoom: 24,
+        zoom: zoom - 1,
+        pitch: 0,
+        interactive: false,
+        attributionControl: false,
+        preserveDrawingBuffer: true
+    });
+
+    return renderMap;
+}
+
 function previewSize(d, zoom) {
     var dx = d.x;
     var dy = d.y;
@@ -178,8 +202,13 @@ function saveFunGL(map, layerDef) {
     imageDiv.innerHTML = "";
     imageDiv.appendChild(spinner);
 
+    // Calculate pixel ratio
+    var actualPixelRatio = window.devicePixelRatio;
+    Object.defineProperty(window, 'devicePixelRatio', {
+        get: function() {return dpi / 96}
+    });
 
-    var container = createMapRenderContainer('render-map', d.x, d.y);
+    var container = createMapRenderContainer('render-map', d.x, d.y, true);
 
     var center = map.getCenter();
     var centerGL = [center.lng, center.lat];
@@ -190,7 +219,7 @@ function saveFunGL(map, layerDef) {
         style: layerDef.style,
         bearing: 0,
         maxZoom: 24,
-        zoom: map.getZoom() - 1,
+        zoom: map.getZoom() - 1 + Math.log2(dpi) - Math.log2(96),
         pitch: 0,
         interactive: false,
         attributionControl: false,
@@ -211,15 +240,20 @@ function saveFunGL(map, layerDef) {
         imageDiv.innerHTML = '';
         imageDiv.appendChild(container);
 
+        var ps = previewSize(d, map.getZoom());
         var img = document.createElement('img');
-        img.width = d.x / 2;
-        img.height = d.y / 2;
+        img.width = ps.dx / 2;
+        img.height = ps.dy / 2;
         img.className = "image_output";
         img.src = canvas.toDataURL();
         imageDiv.innerHTML = '';
         imageDiv.appendChild(img);
         mapDiv.innerHTML = '';
         renderMapGL.off('load', loadHandler);
+
+        Object.defineProperty(window, 'devicePixelRatio', {
+            get: function() {return actualPixelRatio}
+        });
     };
 
     renderMapGL.on('render', handler);
@@ -229,12 +263,21 @@ function saveFunGL(map, layerDef) {
 
 }
 
+function displayCanvas(canvas, xs, ys) {
+    var img = document.createElement('img');
+    img.width = xs;
+    img.height = ys;
+    img.className = "image_output";
+    img.src = canvas.toDataURL();
+    imageDiv.innerHTML = '';
+    imageDiv.appendChild(img);
+    mapDiv.innerHTML = '';
+}
+
 function saveFun(map) {
     // different handling needed for Mapbox GL
     var layerDef = selectedLayerDef(map);
-    if (layerDef.style) {
-        saveFunGL(map, layerDef);
-    } else {
+    {
 
         var dim = previewDimFun;
         var renderMap;
@@ -243,23 +286,26 @@ function saveFun(map) {
         imageDiv.appendChild(spinner);
         if (dim) {
             var d = dim();
-            renderMap = createMapRender(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom())
+            if (layerDef.style) {
+                renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+                renderMap.once("load", function() {
+                    var canvas = renderMap.getCanvas();
+
+                    var d = dim ? dim : currentMapDim;
+                    var ps = previewSize(d(), map.getZoom());
+                    displayCanvas(canvas, ps.dx / 2, ps.dy / 2);
+                })
+
+            } else {
+                renderMap = createMapRender(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+                var aMap = dim ? renderMap : map;
+                leafletImage(aMap, function (err, canvas) {
+                    var d = dim ? dim : currentMapDim;
+                    var ps = previewSize(d(), map.getZoom());
+                    displayCanvas(canvas, ps.dx / 2, ps.dy / 2);
+                }, dim);
+            }
         }
-        var aMap = dim ? renderMap : map;
-        leafletImage(aMap, function (err, canvas) {
-            var d = dim ? dim : currentMapDim;
-            var ps = previewSize(d(), map.getZoom());
-            // now you have canvas
-            var img = document.createElement('img');
-            var dimensions = aMap.getSize();
-            img.width = ps.dx / 2;
-            img.height = ps.dy / 2;
-            img.className = "image_output";
-            img.src = canvas.toDataURL();
-            imageDiv.innerHTML = '';
-            imageDiv.appendChild(img);
-            mapDiv.innerHTML = '';
-        }, dim);
     }
 }
 
@@ -305,23 +351,22 @@ function previewFun(map, dim) {
             [bounds._northEast.lng, bounds._northEast.lat]
         ];
         if (dx !== previewDX || dy !== previewDY || previewStyle !== layerDef.style) {
+            var dpiZoom = Math.log2(dpi) - Math.log2(96);
+
             var renderMapGL = new mapboxgl.Map({
                 container: container,
                 style: layerDef.style,
                 bearing: 0,
                 maxZoom: 24,
                 center: centerGL,
-                zoom: map.getZoom() - 3,
-                bounds: boundsGL, // TODO: fix initial bounds not used
+                zoom: map.getZoom() - 4 + dpiZoom,
                 pitch: 0,
                 interactive: false,
                 attributionControl: false,
                 preserveDrawingBuffer: true
             });
-            renderMapGL.fitBounds(boundsGL);
             var handler = function () {
                 renderMapGL.resize();
-                renderMapGL.fitBounds(boundsGL, {animate: false});
                 renderMapGL.off('render', handler);
             };
             renderMapGL.on('render', handler);
