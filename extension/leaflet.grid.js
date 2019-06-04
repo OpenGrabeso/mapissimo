@@ -1,5 +1,3 @@
-console.log("leaflet.grid.js");
-
 // from https://github.com/jieter/Leaflet.Grid
 /*
  * L.Grid displays a grid of lat/lng lines on the map.

@@ -1,6 +1,3 @@
-console.log("mapbox-gl.js");
-
-
 /* Mapbox GL JS is licensed under the 3-Clause BSD License. Full text of license: https://github.com/mapbox/mapbox-gl-js/blob/v1.0.0/LICENSE.txt */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :

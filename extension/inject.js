@@ -31,7 +31,6 @@
             var s = document.createElement("script");
             s.src = getURL('mapbox-gl.js');
             s.type = 'text/javascript';
-            console.log("inject mapbox-gl.js");
             document.body.appendChild(s);
 
             s.onload = function() {
@@ -39,7 +38,6 @@
                 var s = document.createElement("script");
                 s.src = getURL('leaflet-mapbox-gl.js');
                 s.type = 'text/javascript';
-                console.log("inject leaflet-mapbox-gl.js");
                 document.body.appendChild(s);
 
                 s.onload = function () {
@@ -47,7 +45,6 @@
                     var s = document.createElement("script");
                     s.src = getURL('leaflet.grid.js');
                     s.type = 'text/javascript';
-                    console.log("inject leaflet.grid.js");
                     document.body.appendChild(s);
 
                     s.onload = function () {
@@ -55,7 +52,6 @@
                         s.src = getURL('fix.js');
                         s.type = 'text/javascript';
                         s.dataset.layersUrl = getURL('layers.js');
-                        console.log("inject layers.js");
                         document.body.appendChild(s);
                     }
                 }

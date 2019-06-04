@@ -1,5 +1,3 @@
-console.log("leaflet-mapbox-gl.js");
-
 L.MapboxGL = L.Class.extend({
 
     initialize: function (options) {
