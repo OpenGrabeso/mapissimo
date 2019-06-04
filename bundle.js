@@ -120,22 +120,18 @@ function selectedLayerDef(map) {
     return layerDef;
 }
 
-function createMapRenderContainer(name, dx, dy, hide) {
+function createMapRenderContainer(name, dx, dy) {
     var mapContainer = L.DomUtil.create('div', name);
     mapContainer.style.width = dx + "px";
     mapContainer.style.height = dy + "px";
-    if (hide) {
-        mapContainer.style.position = "fixed";
-        mapContainer.style.left = "-" + mapContainer.style.width;
-    } else {
-
-    }
+    mapContainer.style.position = "fixed";
+    mapContainer.style.left = "-" + (dx + 20) + "px";
     //mapContainer.style.display = "none";
     return mapContainer;
 }
 
 function createMapRender(map, name, dx, dy, pos, zoom) {
-    var mapContainer = createMapRenderContainer(name, dx, dy, true);
+    var mapContainer = createMapRenderContainer(name, dx, dy);
     mapDiv.innerHTML = '';
     mapDiv.appendChild(mapContainer);
     var renderMap = L.map(mapContainer, {
@@ -153,7 +149,7 @@ function createMapRender(map, name, dx, dy, pos, zoom) {
 }
 
 function createMapRenderGL(map, name, dx, dy, pos, zoom) {
-    var mapContainer = createMapRenderContainer(name, dx, dy, true);
+    var mapContainer = createMapRenderContainer(name, dx, dy);
     mapDiv.innerHTML = '';
     mapDiv.appendChild(mapContainer);
     var layerDef = selectedLayerDef(map);
@@ -191,77 +187,6 @@ var previewDimFun;
 
 function currentMapDim() {
     return mymap.getSize();
-}
-
-var printedMap;
-
-function saveFunGL(map, layerDef) {
-    var dim = previewDimFun;
-    if (!dim) return; // MapBox print not supported without dimensions
-    var d = dim();
-    var spinner = L.DomUtil.create('div', 'loader');
-    imageDiv.innerHTML = "";
-    imageDiv.appendChild(spinner);
-
-    // Calculate pixel ratio
-    var actualPixelRatio = window.devicePixelRatio;
-    Object.defineProperty(window, 'devicePixelRatio', {
-        get: function() {return dpi / 96}
-    });
-
-    var container = createMapRenderContainer('render-map', d.x, d.y, true);
-
-    var center = map.getCenter();
-    var centerGL = [center.lng, center.lat];
-
-    var renderMapGL = new mapboxgl.Map({
-        container: container,
-        center: centerGL,
-        style: layerDef.style,
-        bearing: 0,
-        maxZoom: 24,
-        zoom: map.getZoom() - 1 + Math.log2(dpi) - Math.log2(96),
-        pitch: 0,
-        interactive: false,
-        attributionControl: false,
-        preserveDrawingBuffer: true
-    });
-
-    if (printedMap) {
-        printedMap.remove();
-    }
-
-    var handler =  function () {
-        renderMapGL.off('render', handler);
-        renderMapGL.resize();
-    };
-    var loadHandler =  function () {
-        renderMapGL.resize();
-        var canvas = renderMapGL.getCanvas();
-        imageDiv.innerHTML = '';
-        imageDiv.appendChild(container);
-
-        var ps = previewSize(d, map.getZoom());
-        var img = document.createElement('img');
-        img.width = ps.dx / 2;
-        img.height = ps.dy / 2;
-        img.className = "image_output";
-        img.src = canvas.toDataURL();
-        imageDiv.innerHTML = '';
-        imageDiv.appendChild(img);
-        mapDiv.innerHTML = '';
-        renderMapGL.off('load', loadHandler);
-
-        Object.defineProperty(window, 'devicePixelRatio', {
-            get: function() {return actualPixelRatio}
-        });
-    };
-
-    renderMapGL.on('render', handler);
-    renderMapGL.on('load', loadHandler);
-
-    printedMap = renderMapGL;
-
 }
 
 function displayCanvas(canvas, xs, ys) {
@@ -303,6 +228,7 @@ function saveFun(map) {
                 var d = dim ? dim : currentMapDim;
                 var ps = previewSize(d(), map.getZoom());
                 displayCanvas(canvas, ps.dx / 2, ps.dy / 2);
+                renderMap.remove();
             }, dim);
         }
     }
