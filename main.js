@@ -434,18 +434,23 @@ function drawLines(canvas, bounds) {
         gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
         var itemSize = 2;
         var numItems = vertices.length / itemSize;
 
         gl.useProgram(program);
 
         program.uColor = gl.getUniformLocation(program, "uColor");
-        gl.uniform4fv(program.uColor, [0.0, 0.3, 0.0, 1.0]);
+        gl.uniform4fv(program.uColor, [0.8, 0.2, 0.0, 0.8]);
 
         program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
         gl.enableVertexAttribArray(program.aVertexPosition);
         gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.LINES, 0, numItems);
+
+        gl.disable(gl.BLEND);
     }
 }
