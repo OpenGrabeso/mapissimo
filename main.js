@@ -248,6 +248,10 @@ function updatePreview(map) {
 }
 
 function previewCanvas(canvas, xs, ys) {
+    if (canvas.getContext) {
+        drawLines(canvas);
+    }
+
     var img = document.createElement('img');
     img.width = xs;
     img.height = ys;
@@ -343,3 +347,71 @@ L.Map.addInitHook(function () {
         });
     }
 });
+
+var vertexShader2D = `
+    attribute vec2 aVertexPosition; 
+    void main()
+    { 
+        gl_Position = vec4(aVertexPosition, 0.0, 1.0); 
+    }
+`;
+
+var fragmentShader2D = `
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    
+    uniform vec4 uColor;
+    
+    void main() {
+        gl_FragColor = uColor;
+    }
+`;
+
+
+function drawLines(canvas) {
+    var gl = canvas.getContext("webgl");
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    var v = vertexShader2D;
+    var f = fragmentShader2D;
+
+    var vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, v);
+    gl.compileShader(vs);
+
+    var fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, f);
+    gl.compileShader(fs);
+
+    var program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    var aspect = canvas.width / canvas.height;
+
+    var vertices = new Float32Array([
+        -0.5, 0.5 * aspect, 0.5, 0.5 * aspect, 0.5, -0.5 * aspect, // Triangle 1
+        -0.5, 0.5 * aspect, 0.5, -0.5 * aspect, -0.5, -0.5 * aspect // Triangle 2
+    ]);
+
+    var vbuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    var itemSize = 2;
+    var numItems = vertices.length / itemSize;
+
+    gl.useProgram(program);
+
+    program.uColor = gl.getUniformLocation(program, "uColor");
+    gl.uniform4fv(program.uColor, [0.0, 0.3, 0.0, 1.0]);
+
+    program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+    gl.enableVertexAttribArray(program.aVertexPosition);
+    gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.drawArrays(gl.LINES, 0, numItems);
+}
