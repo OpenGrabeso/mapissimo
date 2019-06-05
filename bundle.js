@@ -404,29 +404,25 @@ function drawLines(canvas, bounds) {
     var boundsLngDist = (bounds._ne.lng - bounds._sw.lng);
     var boundsLatDist = (bounds._ne.lat - bounds._sw.lat);
 
-    var latKm = meridian * (boundsLatDist / 180);
-    var lngKm = parallel * (boundsLngDist / 360);
+    var canvasHeightKm = meridian * (boundsLatDist / 180);
+    var canvasWidthKm = parallel * (boundsLngDist / 360);
 
-    var pixelsLatKm = canvas.height / latKm;
-    var pixelsLngKm = canvas.width / lngKm;
+    var linesV = Math.ceil(canvasWidthKm);
+    var linesH = Math.ceil(canvasHeightKm);
 
-    if (latKm < 100 && lngKm < 100) {
-
-        var linesV = Math.ceil(canvas.width / pixelsLngKm);
-        var linesH = Math.ceil(canvas.height / pixelsLatKm);
-
+    if (linesV < 100 && linesH < 100) {
         var vertexData = new Array(linesV * 4 + linesH * 4);
         var l;
         for (l = 0; l < linesV; l++) {
-            var xs = ((l * pixelsLngKm) / canvas.width) * 2 - 1;
+            var xs = (l / canvasWidthKm) * 2 - 1;
             vertexData[l * 4] = xs;
             vertexData[l * 4 + 1] = -1;
             vertexData[l * 4 + 2] = xs;
             vertexData[l * 4 + 3] = +1;
         }
 
-        for (l = 0; l < linesV; l++) {
-            var ys = ((l * pixelsLatKm) / canvas.height) * 2 - 1;
+        for (l = 0; l < linesH; l++) {
+            var ys = (l / canvasHeightKm) * 2 - 1;
             vertexData[linesV * 4 + l * 4] = -1;
             vertexData[linesV * 4 + l * 4 + 1] = ys;
             vertexData[linesV * 4 + l * 4 + 2] = +1;
