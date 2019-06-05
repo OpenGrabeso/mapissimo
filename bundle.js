@@ -189,8 +189,8 @@ function currentMapDim() {
     return mymap.getSize();
 }
 
-function displayCanvas(canvas, xs, ys) {
-    drawLines(canvas);
+function displayCanvas(canvas, xs, ys, bounds) {
+    drawLines(canvas, bounds);
 
     var img = document.createElement('img');
     img.width = xs;
@@ -219,7 +219,7 @@ function saveFun(map) {
 
                 var d = dim ? dim : currentMapDim;
                 var ps = previewSize(d(), map.getZoom());
-                displayCanvas(canvas, ps.dx / 2, ps.dy / 2);
+                displayCanvas(canvas, ps.dx / 2, ps.dy / 2, renderMap.getBounds());
                 renderMap.remove();
             })
 
@@ -250,8 +250,8 @@ function updatePreview(map) {
     }
 }
 
-function previewCanvas(canvas, xs, ys) {
-    drawLines(canvas);
+function previewCanvas(canvas, xs, ys, bounds) {
+    drawLines(canvas, bounds);
 
     var img = document.createElement('img');
     img.width = xs;
@@ -279,7 +279,7 @@ function previewFun(map, dim) {
         renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom);
         renderMap.once("load", function() {
             var canvas = renderMap.getCanvas();
-            previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2);
+            previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
             renderMap.remove();
         })
     } else {
@@ -370,7 +370,8 @@ var fragmentShader2D = `
 `;
 
 
-function drawLines(canvas) {
+function drawLines(canvas, bounds) {
+    if (!bounds) return;
     if (!canvas.getContext) return;
     var gl = canvas.getContext("webgl");
     if (!gl) return;
@@ -391,51 +392,67 @@ function drawLines(canvas) {
     gl.attachShader(program, fs);
     gl.linkProgram(program);
 
-    var aspect = canvas.width / canvas.height;
+    var lng = (bounds._ne.lng + bounds._sw.lng) / 2;
+    var lat = (bounds._ne.lat + bounds._sw.lat) / 2;
 
-    var lineStepV = 40;
-    var linesV = Math.ceil(canvas.width / lineStepV);
+    // meridian is always the same length
+    var degree = Math.PI / 180;
+    var meridian = 20003.930;
+    var equator = 40075.160;
+    var parallel = Math.cos(lat*degree) * equator;
 
-    var lineStepH = 60;
-    var linesH = Math.ceil(canvas.height / lineStepH);
+    var boundsLngDist = (bounds._ne.lng - bounds._sw.lng);
+    var boundsLatDist = (bounds._ne.lat - bounds._sw.lat);
 
-    var vertexData = new Array(linesV * 4 + linesH * 4);
-    var l;
-    for (l = 0; l < linesV; l ++) {
-        var xs = ((l * lineStepV) / canvas.width) * 2 - 1;
-        vertexData[l * 4] = xs;
-        vertexData[l * 4 + 1] = -1;
-        vertexData[l * 4 + 2] = xs;
-        vertexData[l * 4 + 3] = +1;
+    var latKm = meridian * (boundsLatDist / 180);
+    var lngKm = parallel * (boundsLngDist / 360);
+
+    var pixelsLatKm = canvas.height / latKm;
+    var pixelsLngKm = canvas.width / lngKm;
+
+    if (latKm < 100 && lngKm < 100) {
+
+        var linesV = Math.ceil(canvas.width / pixelsLngKm);
+        var linesH = Math.ceil(canvas.height / pixelsLatKm);
+
+        var vertexData = new Array(linesV * 4 + linesH * 4);
+        var l;
+        for (l = 0; l < linesV; l++) {
+            var xs = ((l * pixelsLngKm) / canvas.width) * 2 - 1;
+            vertexData[l * 4] = xs;
+            vertexData[l * 4 + 1] = -1;
+            vertexData[l * 4 + 2] = xs;
+            vertexData[l * 4 + 3] = +1;
+        }
+
+        for (l = 0; l < linesV; l++) {
+            var ys = ((l * pixelsLatKm) / canvas.height) * 2 - 1;
+            vertexData[linesV * 4 + l * 4] = -1;
+            vertexData[linesV * 4 + l * 4 + 1] = ys;
+            vertexData[linesV * 4 + l * 4 + 2] = +1;
+            vertexData[linesV * 4 + l * 4 + 3] = ys;
+        }
+
+        var vertices = Float32Array.from(vertexData);
+
+        var vbuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        var itemSize = 2;
+        var numItems = vertices.length / itemSize;
+
+        gl.useProgram(program);
+
+        program.uColor = gl.getUniformLocation(program, "uColor");
+        gl.uniform4fv(program.uColor, [0.0, 0.3, 0.0, 1.0]);
+
+        program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+        gl.enableVertexAttribArray(program.aVertexPosition);
+        gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.LINES, 0, numItems);
     }
-
-    for (l = 0; l < linesV; l ++) {
-        var ys = ((l * lineStepH) / canvas.height) * 2 - 1;
-        vertexData[linesV * 4 + l * 4] = -1;
-        vertexData[linesV * 4 + l * 4 + 1] = ys;
-        vertexData[linesV * 4 + l * 4 + 2] = +1;
-        vertexData[linesV * 4 + l * 4 + 3] = ys;
-    }
-
-    var vertices = Float32Array.from(vertexData);
-
-    var vbuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-    var itemSize = 2;
-    var numItems = vertices.length / itemSize;
-
-    gl.useProgram(program);
-
-    program.uColor = gl.getUniformLocation(program, "uColor");
-    gl.uniform4fv(program.uColor, [0.0, 0.3, 0.0, 1.0]);
-
-    program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
-    gl.enableVertexAttribArray(program.aVertexPosition);
-    gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.drawArrays(gl.LINES, 0, numItems);
 }
 
 },{"leaflet-image":3}],2:[function(require,module,exports){
