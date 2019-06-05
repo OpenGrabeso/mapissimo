@@ -189,6 +189,8 @@ function currentMapDim() {
 }
 
 function displayCanvas(canvas, xs, ys) {
+    drawLines(canvas);
+
     var img = document.createElement('img');
     img.width = xs;
     img.height = ys;
@@ -248,9 +250,7 @@ function updatePreview(map) {
 }
 
 function previewCanvas(canvas, xs, ys) {
-    if (canvas.getContext) {
-        drawLines(canvas);
-    }
+    drawLines(canvas);
 
     var img = document.createElement('img');
     img.width = xs;
@@ -370,9 +370,9 @@ var fragmentShader2D = `
 
 
 function drawLines(canvas) {
+    if (!canvas.getContext) return;
     var gl = canvas.getContext("webgl");
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (!gl) return;
 
     var v = vertexShader2D;
     var f = fragmentShader2D;
@@ -392,10 +392,31 @@ function drawLines(canvas) {
 
     var aspect = canvas.width / canvas.height;
 
-    var vertices = new Float32Array([
-        -0.5, 0.5 * aspect, 0.5, 0.5 * aspect, 0.5, -0.5 * aspect, // Triangle 1
-        -0.5, 0.5 * aspect, 0.5, -0.5 * aspect, -0.5, -0.5 * aspect // Triangle 2
-    ]);
+    var lineStepV = 40;
+    var linesV = Math.ceil(canvas.width / lineStepV);
+
+    var lineStepH = 60;
+    var linesH = Math.ceil(canvas.height / lineStepH);
+
+    var vertexData = new Array(linesV * 4 + linesH * 4);
+    var l;
+    for (l = 0; l < linesV; l ++) {
+        var xs = ((l * lineStepV) / canvas.width) * 2 - 1;
+        vertexData[l * 4] = xs;
+        vertexData[l * 4 + 1] = -1;
+        vertexData[l * 4 + 2] = xs;
+        vertexData[l * 4 + 3] = +1;
+    }
+
+    for (l = 0; l < linesV; l ++) {
+        var ys = ((l * lineStepH) / canvas.height) * 2 - 1;
+        vertexData[linesV * 4 + l * 4] = -1;
+        vertexData[linesV * 4 + l * 4 + 1] = ys;
+        vertexData[linesV * 4 + l * 4 + 2] = +1;
+        vertexData[linesV * 4 + l * 4 + 3] = ys;
+    }
+
+    var vertices = Float32Array.from(vertexData);
 
     var vbuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
