@@ -20,15 +20,33 @@ function generateMapLayers(token){
 	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">OpenTopoMap.org</a>';
     var mapboxAttr = osmAttr + ', Tiles courtesy of <a href="https://www.mapbox.com" target="_blank">Mapbox.com</a>';
 	return [
-        {type: "routes-ex", name: "Tracks&Routes",
-            url: "https://api.mapbox.com/styles/v1/ospanel/cjkbfwccz11972rmt4xvmvme6/tiles/256/{z}/{x}/{y}?access_token=" + token,
+        {type: "routes", name: "Tracks&Routes",
+            // NG style - cjh226q3j0rtd2roxwnwlwy13
+            style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
+            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        {type: "routes", name: "Tracks&Routes(Old)",
+        {type: "mapboxoutdoors", name: "Mapbox Outdoors",
+            // NG style - cjh226q3j0rtd2roxwnwlwy13
+            style: "mapbox://styles/mapbox/outdoors-v10",
+            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
+            grid: true,
+        },
+        {type: "routesold", name: "Tracks&Routes(Old)",
             url: "https://api.mapbox.com/styles/v1/ospanel/cjhbykqgr07cz2rph29u6h6yl/tiles/256/{z}/{x}/{y}?access_token=" + token,
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
+        },
+        {type: "routesheat", name: "Tracks&Routes+Heatmap",
+            style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
+            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
+            grid: true,
+            overlay:
+                {url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
+                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", opacity: 0.6, transparency: 'true', attribution: stravaAttr}}
         },
 		{type: "openstreetmap", name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

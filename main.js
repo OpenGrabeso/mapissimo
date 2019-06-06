@@ -101,13 +101,43 @@ function createText(pos, getter, store) {
     };
 }
 
-function createMapRender(name, dx, dy, pos, zoom) {
-    var mapContainer = L.DomUtil.create('div', name);
-    mapContainer.style.position = "fixed";
+function selectedLayerDef(map) {
+    var layerDef = mapLayers[0];
+    var found = false;
+    map.eachLayer(function(l) {
+        if (map.hasLayer(l)) {
+            //try to find URL
+            if (!found) {
+                for (var mi = 0; mi < mapLayers.length; mi++) {
+                    // TODO: check style properly
+                    if (l._url && mapLayers[mi].url === l._url || l.options && l.options.style && mapLayers[mi].style === l.options.style) {
+                        layerDef = mapLayers[mi];
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+    });
+    return layerDef;
+}
+
+function sizeMapRenderContainer(mapContainer, dx, dy) {
     mapContainer.style.width = dx + "px";
     mapContainer.style.height = dy + "px";
-    mapContainer.style.left = "-" + mapContainer.style.width;
+    mapContainer.style.position = "fixed";
+    mapContainer.style.left = "-" + (dx + 20) + "px";
     //mapContainer.style.display = "none";
+}
+
+function createMapRenderContainer(name, dx, dy) {
+    var mapContainer = L.DomUtil.create('div', name);
+    sizeMapRenderContainer(mapContainer, dx, dy);
+    return mapContainer;
+}
+
+function createMapRender(map, name, dx, dy, pos, zoom) {
+    var mapContainer = createMapRenderContainer(name, dx, dy);
     mapDiv.innerHTML = '';
     mapDiv.appendChild(mapContainer);
     var renderMap = L.map(mapContainer, {
@@ -117,20 +147,53 @@ function createMapRender(name, dx, dy, pos, zoom) {
         scrollWheelZoom: false,
         exportControl: false
     });
-    var layerDef = mapLayers[0];
-    mymap.eachLayer(function(l) {
-        //try to find URL
-        for (var mi = 0; mi < mapLayers.length; mi ++) {
-            if (mapLayers[mi].url === l._url) {
-                layerDef = mapLayers[mi];
-                break;
-            }
-        }
-    });
+    var layerDef = selectedLayerDef(map);
     var layer = tileLayer(layerDef);
     layer.addTo(renderMap);
     renderMap.setView(pos, zoom);
     return renderMap;
+}
+
+var cacheRenderMapGL;
+var cacheMapContainer;
+var cacheRenderMapWidth;
+var cacheRenderMapHeight;
+
+function createMapRenderGL(map, name, dx, dy, pos, zoom, cache) {
+    var layerDef = selectedLayerDef(map);
+    var centerGL = [pos.lng, pos.lat];
+    if (cache && !cacheRenderMapGL || cacheRenderMapWidth !== dx || cacheRenderMapHeight !== dy) {
+        if (cacheRenderMapGL) {
+            cacheRenderMapGL.remove();
+        }
+        var mapContainer = createMapRenderContainer(name, dx, dy);
+        mapDiv.innerHTML = '';
+        mapDiv.appendChild(mapContainer);
+        var renderMap = new mapboxgl.Map({
+            container: mapContainer,
+            center: centerGL,
+            style: layerDef.style,
+            fadeDuration: 0, // disable symbol transitions for faster response (idle otherwise takes quite long)
+            bearing: 0,
+            maxZoom: 24,
+            zoom: zoom - 1,
+            pitch: 0,
+            interactive: false,
+            attributionControl: false,
+            preserveDrawingBuffer: true
+        });
+        cacheRenderMapGL = renderMap;
+        cacheMapContainer = mapContainer;
+        cacheRenderMapWidth = dx;
+        cacheRenderMapHeight = dy;
+        return renderMap;
+    } else {
+        sizeMapRenderContainer(cacheMapContainer, dx, dy);
+        cacheRenderMapGL.setStyle(layerDef.style);
+        cacheRenderMapGL.setCenter(centerGL);
+        cacheRenderMapGL.setZoom(zoom - 1);
+        return cacheRenderMapGL;
+    }
 }
 
 function previewSize(d, zoom) {
@@ -150,7 +213,22 @@ function currentMapDim() {
     return mymap.getSize();
 }
 
+function displayCanvas(canvas, xs, ys, bounds) {
+    drawLines(canvas, bounds);
+
+    var img = document.createElement('img');
+    img.width = xs;
+    img.height = ys;
+    img.className = "image_output";
+    img.src = canvas.toDataURL();
+    imageDiv.innerHTML = '';
+    imageDiv.appendChild(img);
+    mapDiv.innerHTML = '';
+}
+
 function saveFun(map) {
+    // different handling needed for Mapbox GL
+    var layerDef = selectedLayerDef(map);
     var dim = previewDimFun;
     var renderMap;
     var spinner = L.DomUtil.create('div', 'loader');
@@ -158,23 +236,27 @@ function saveFun(map) {
     imageDiv.appendChild(spinner);
     if (dim) {
         var d = dim();
-        renderMap = createMapRender('render-map', d.x, d.y, map.getCenter(), map.getZoom())
+        if (layerDef.style) {
+            renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+            renderMap.once("idle", function() {
+                var canvas = renderMap.getCanvas();
+                var d = dim ? dim : currentMapDim;
+                var ps = previewSize(d(), map.getZoom());
+                displayCanvas(canvas, ps.dx / 2, ps.dy / 2, renderMap.getBounds());
+                renderMap.remove();
+            })
+
+        } else {
+            renderMap = createMapRender(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+            var aMap = dim ? renderMap : map;
+            leafletImage(aMap, function (err, canvas) {
+                var d = dim ? dim : currentMapDim;
+                var ps = previewSize(d(), map.getZoom());
+                displayCanvas(canvas, ps.dx / 2, ps.dy / 2);
+                renderMap.remove();
+            }, dim);
+        }
     }
-    var aMap = dim ? renderMap : map;
-    leafletImage(aMap, function(err, canvas) {
-        var d = dim ? dim : currentMapDim;
-        var ps = previewSize(d(), map.getZoom());
-        // now you have canvas
-        var img = document.createElement('img');
-        var dimensions = aMap.getSize();
-        img.width = ps.dx / 2;
-        img.height = ps.dy / 2;
-        img.className = "image_output";
-        img.src = canvas.toDataURL();
-        imageDiv.innerHTML = '';
-        imageDiv.appendChild(img);
-        mapDiv.innerHTML = '';
-    }, dim);
 }
 
 function selectPreviewFun(map, dim) {
@@ -191,6 +273,20 @@ function updatePreview(map) {
     }
 }
 
+function previewCanvas(canvas, xs, ys, bounds) {
+    drawLines(canvas, bounds);
+
+    var img = document.createElement('img');
+    img.width = xs;
+    img.height = ys;
+    img.className = "image_output";
+    img.src = canvas.toDataURL();
+
+    previewDiv.innerHTML = '';
+    previewDiv.appendChild(img);
+    mapDiv.innerHTML = '';
+}
+
 function previewFun(map, dim) {
 
     var ps = previewSize(dim(), map.getZoom());
@@ -199,19 +295,24 @@ function previewFun(map, dim) {
     var dy = ps.dy;
     var zoom = ps.zoom;
 
-    var renderMap = createMapRender('preview-map', dx, dy, map.getCenter(), zoom);
+    var layerDef = selectedLayerDef(map);
+    var renderMap;
 
-    leafletImage(renderMap, function(err, canvas) {
-        // now you have canvas
-        var img = document.createElement('img');
-        img.width = dx / 2;
-        img.height = dy / 2;
-        img.className = "image_output";
-        img.src = canvas.toDataURL();
-        previewDiv.innerHTML = '';
-        previewDiv.appendChild(img);
-        mapDiv.innerHTML = '';
-    }, dim);
+    if (layerDef.style) {
+        renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
+        var renderedHandler = function() {
+            var canvas = renderMap.getCanvas();
+            previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
+        };
+        renderMap.once("idle", renderedHandler);
+    } else {
+        renderMap = createMapRender(map, 'preview-map', dx, dy, map.getCenter(), zoom);
+        leafletImage(renderMap, function (err, canvas) {
+            // now you have canvas
+            previewCanvas(canvas, dx / 2, dy / 2);
+            renderMap.remove();
+        }, dim);
+    }
 }
 
 function adjustDpi(map, steps) {
@@ -241,7 +342,7 @@ L.Map.addInitHook(function () {
         var createControls = [
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Print", function(map){saveFun(map)})},
-                ]),
+            ]),
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Window", function(map){selectPreviewFun(map, undefined)})},
                 function(map){return createButtonControl(map, "A4 Landscape", function(map){selectPreviewFun(map, landscapeDim)})},
@@ -252,7 +353,7 @@ L.Map.addInitHook(function () {
                     function(map){return createButtonControl(map, "+", function(map){adjustDpi(map, +1)})},
                     function(map){return createTextControl(function(x){dpiText = x})},
                     function(map){return createButtonControl(map, "-", function(map){adjustDpi(map, -1)})},
-            ]),
+                ]),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
             createOutput("bottomleft", "preview", function(x){previewDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
@@ -270,3 +371,115 @@ L.Map.addInitHook(function () {
         });
     }
 });
+
+var vertexShader2D = `
+    attribute vec2 aVertexPosition; 
+    void main()
+    { 
+        gl_Position = vec4(aVertexPosition, 0.0, 1.0); 
+    }
+`;
+
+var fragmentShader2D = `
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    
+    uniform vec4 uColor;
+    
+    void main() {
+        gl_FragColor = uColor;
+    }
+`;
+
+
+function drawLines(canvas, bounds) {
+    if (!bounds) return;
+    if (!canvas.getContext) return;
+    var gl = canvas.getContext("webgl");
+    if (!gl) return;
+
+    var v = vertexShader2D;
+    var f = fragmentShader2D;
+
+    var vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, v);
+    gl.compileShader(vs);
+
+    var fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, f);
+    gl.compileShader(fs);
+
+    var program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    var lng = (bounds._ne.lng + bounds._sw.lng) / 2;
+    var lat = (bounds._ne.lat + bounds._sw.lat) / 2;
+
+    // meridian is always the same length
+    var degree = Math.PI / 180;
+    var meridian = 20003.930;
+    var equator = 40075.160;
+    var parallel = Math.cos(lat*degree) * equator;
+
+    var boundsLngDist = (bounds._ne.lng - bounds._sw.lng);
+    var boundsLatDist = (bounds._ne.lat - bounds._sw.lat);
+
+    var canvasHeightKm = meridian * (boundsLatDist / 180);
+    var canvasWidthKm = parallel * (boundsLngDist / 360);
+
+    var linesV = Math.ceil(canvasWidthKm);
+    var linesH = Math.ceil(canvasHeightKm);
+
+    var kmInPixelsH = canvas.width / canvasWidthKm;
+    var kmInPixelsV = canvas.height / canvasHeightKm;
+
+    if (kmInPixelsH > 15 && kmInPixelsV > 15) {
+        var alpha = (Math.min(kmInPixelsH, kmInPixelsV) - 15) / 30;
+        if (alpha > 1) alpha = 1;
+        var vertexData = new Array(linesV * 4 + linesH * 4);
+        var l;
+        for (l = 0; l < linesV; l++) {
+            var xs = (l / canvasWidthKm) * 2 - 1;
+            vertexData[l * 4] = xs;
+            vertexData[l * 4 + 1] = -1;
+            vertexData[l * 4 + 2] = xs;
+            vertexData[l * 4 + 3] = +1;
+        }
+
+        for (l = 0; l < linesH; l++) {
+            var ys = (l / canvasHeightKm) * 2 - 1;
+            vertexData[linesV * 4 + l * 4] = -1;
+            vertexData[linesV * 4 + l * 4 + 1] = ys;
+            vertexData[linesV * 4 + l * 4 + 2] = +1;
+            vertexData[linesV * 4 + l * 4 + 3] = ys;
+        }
+
+        var vertices = Float32Array.from(vertexData);
+
+        var vbuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+        var itemSize = 2;
+        var numItems = vertices.length / itemSize;
+
+        gl.useProgram(program);
+
+        program.uColor = gl.getUniformLocation(program, "uColor");
+        gl.uniform4fv(program.uColor, [0.8 * alpha, 0.25 * alpha, 0.0, 0.8 * alpha]);
+
+        program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+        gl.enableVertexAttribArray(program.aVertexPosition);
+        gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.LINES, 0, numItems);
+
+        gl.disable(gl.BLEND);
+    }
+}
