@@ -122,13 +122,17 @@ function selectedLayerDef(map) {
     return layerDef;
 }
 
-function createMapRenderContainer(name, dx, dy) {
-    var mapContainer = L.DomUtil.create('div', name);
+function sizeMapRenderContainer(mapContainer, dx, dy) {
     mapContainer.style.width = dx + "px";
     mapContainer.style.height = dy + "px";
     mapContainer.style.position = "fixed";
     mapContainer.style.left = "-" + (dx + 20) + "px";
     //mapContainer.style.display = "none";
+}
+
+function createMapRenderContainer(name, dx, dy) {
+    var mapContainer = L.DomUtil.create('div', name);
+    sizeMapRenderContainer(mapContainer, dx, dy);
     return mapContainer;
 }
 
@@ -150,28 +154,46 @@ function createMapRender(map, name, dx, dy, pos, zoom) {
     return renderMap;
 }
 
-function createMapRenderGL(map, name, dx, dy, pos, zoom) {
-    var mapContainer = createMapRenderContainer(name, dx, dy);
-    mapDiv.innerHTML = '';
-    mapDiv.appendChild(mapContainer);
+var cacheRenderMapGL;
+var cacheMapContainer;
+var cacheRenderMapWidth;
+var cacheRenderMapHeight;
+
+function createMapRenderGL(map, name, dx, dy, pos, zoom, cache) {
     var layerDef = selectedLayerDef(map);
-
     var centerGL = [pos.lng, pos.lat];
-
-    var renderMap = new mapboxgl.Map({
-        container: mapContainer,
-        center: centerGL,
-        style: layerDef.style,
-        bearing: 0,
-        maxZoom: 24,
-        zoom: zoom - 1,
-        pitch: 0,
-        interactive: false,
-        attributionControl: false,
-        preserveDrawingBuffer: true
-    });
-
-    return renderMap;
+    if (cache && !cacheRenderMapGL || cacheRenderMapWidth !== dx || cacheRenderMapHeight !== dy) {
+        if (cacheRenderMapGL) {
+            cacheRenderMapGL.remove();
+        }
+        var mapContainer = createMapRenderContainer(name, dx, dy);
+        mapDiv.innerHTML = '';
+        mapDiv.appendChild(mapContainer);
+        var renderMap = new mapboxgl.Map({
+            container: mapContainer,
+            center: centerGL,
+            style: layerDef.style,
+            fadeDuration: 0, // disable symbol transitions for faster response (idle otherwise takes quite long)
+            bearing: 0,
+            maxZoom: 24,
+            zoom: zoom - 1,
+            pitch: 0,
+            interactive: false,
+            attributionControl: false,
+            preserveDrawingBuffer: true
+        });
+        cacheRenderMapGL = renderMap;
+        cacheMapContainer = mapContainer;
+        cacheRenderMapWidth = dx;
+        cacheRenderMapHeight = dy;
+        return renderMap;
+    } else {
+        sizeMapRenderContainer(cacheMapContainer, dx, dy);
+        cacheRenderMapGL.setStyle(layerDef.style);
+        cacheRenderMapGL.setCenter(centerGL);
+        cacheRenderMapGL.setZoom(zoom - 1);
+        return cacheRenderMapGL;
+    }
 }
 
 function previewSize(d, zoom) {
@@ -216,9 +238,8 @@ function saveFun(map) {
         var d = dim();
         if (layerDef.style) {
             renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
-            renderMap.once("load", function() {
+            renderMap.once("idle", function() {
                 var canvas = renderMap.getCanvas();
-
                 var d = dim ? dim : currentMapDim;
                 var ps = previewSize(d(), map.getZoom());
                 displayCanvas(canvas, ps.dx / 2, ps.dy / 2, renderMap.getBounds());
@@ -278,12 +299,13 @@ function previewFun(map, dim) {
     var renderMap;
 
     if (layerDef.style) {
-        renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom);
-        renderMap.once("load", function() {
+        renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
+        var renderedHandler = function() {
+            console.log("rendered");
             var canvas = renderMap.getCanvas();
             previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
-            renderMap.remove();
-        })
+        };
+        renderMap.once("idle", renderedHandler);
     } else {
         renderMap = createMapRender(map, 'preview-map', dx, dy, map.getCenter(), zoom);
         leafletImage(renderMap, function (err, canvas) {
