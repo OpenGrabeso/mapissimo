@@ -302,7 +302,6 @@ function previewFun(map, dim) {
     if (layerDef.style) {
         renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
         var renderedHandler = function() {
-            console.log("rendered");
             var canvas = renderMap.getCanvas();
             previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
         };
