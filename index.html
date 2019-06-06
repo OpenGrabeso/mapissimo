@@ -68,26 +68,29 @@
         return r;
     }
 
-    var baseMaps = buildBaseMaps();
+    function initMaps() {
+        var baseMaps = buildBaseMaps();
 
-    L.control.layers(baseMaps).addTo(mymap);
-    baseMaps[mapLayers[0].name].addTo(mymap);
-    var geocoderOptions = {
-        defaultMarkGeocode: false
-    };
-    var geocoder = L.Control.geocoder(geocoderOptions); // uses nominatim by default
-    geocoder.on('markgeocode', function(e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-            bbox.getSouthEast(),
-            bbox.getNorthEast(),
-            bbox.getNorthWest(),
-            bbox.getSouthWest()
-        ]).addTo(mymap);
-        mymap.fitBounds(poly.getBounds());
-        poly.remove(mymap);
-    }).addTo(mymap);
+        L.control.layers(baseMaps).addTo(mymap);
+        baseMaps[mapLayers[0].name].addTo(mymap);
+        var geocoderOptions = {
+            defaultMarkGeocode: false
+        };
+        var geocoder = L.Control.geocoder(geocoderOptions); // uses nominatim by default
+        geocoder.on('markgeocode', function (e) {
+            var bbox = e.geocode.bbox;
+            var poly = L.polygon([
+                bbox.getSouthEast(),
+                bbox.getNorthEast(),
+                bbox.getNorthWest(),
+                bbox.getSouthWest()
+            ]).addTo(mymap);
+            mymap.fitBounds(poly.getBounds());
+            poly.remove(mymap);
+        }).addTo(mymap);
+    }
 
+    window.onload = initMaps;
 </script>
 
 </body>

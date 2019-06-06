@@ -105,13 +105,16 @@ function selectedLayerDef(map) {
     var layerDef = mapLayers[0];
     var found = false;
     map.eachLayer(function(l) {
-        //try to find URL
-        if (!found) {
-            for (var mi = 0; mi < mapLayers.length; mi++) {
-                if (mapLayers[mi].url === l._url) {
-                    layerDef = mapLayers[mi];
-                    found = true;
-                    break;
+        if (map.hasLayer(l)) {
+            //try to find URL
+            if (!found) {
+                for (var mi = 0; mi < mapLayers.length; mi++) {
+                    // TODO: check style properly
+                    if (l._url && mapLayers[mi].url === l._url || l.options && l.options.style && mapLayers[mi].style === l.options.style) {
+                        layerDef = mapLayers[mi];
+                        found = true;
+                        break;
+                    }
                 }
             }
         }
@@ -318,7 +321,7 @@ L.Map.addInitHook(function () {
         var createControls = [
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Print", function(map){saveFun(map)})},
-                ]),
+            ]),
             createControlGroup("bottomleft", [
                 function(map){return createButtonControl(map, "Window", function(map){selectPreviewFun(map, undefined)})},
                 function(map){return createButtonControl(map, "A4 Landscape", function(map){selectPreviewFun(map, landscapeDim)})},
@@ -329,7 +332,7 @@ L.Map.addInitHook(function () {
                     function(map){return createButtonControl(map, "+", function(map){adjustDpi(map, +1)})},
                     function(map){return createTextControl(function(x){dpiText = x})},
                     function(map){return createButtonControl(map, "-", function(map){adjustDpi(map, -1)})},
-            ]),
+                ]),
             createOutput("bottomleft", "image-map", function(x){mapDiv = x}),
             createOutput("bottomleft", "preview", function(x){previewDiv = x}),
             createOutput("bottomleft", "image", function(x){imageDiv = x}),
@@ -409,7 +412,12 @@ function drawLines(canvas, bounds) {
     var linesV = Math.ceil(canvasWidthKm);
     var linesH = Math.ceil(canvasHeightKm);
 
-    if (linesV < 100 && linesH < 100) {
+    var kmInPixelsH = canvas.width / canvasWidthKm;
+    var kmInPixelsV = canvas.height / canvasHeightKm;
+
+    if (kmInPixelsH > 15 && kmInPixelsV > 15) {
+        var alpha = (Math.min(kmInPixelsH, kmInPixelsV) - 15) / 30;
+        if (alpha > 1) alpha = 1;
         var vertexData = new Array(linesV * 4 + linesH * 4);
         var l;
         for (l = 0; l < linesV; l++) {
@@ -443,7 +451,7 @@ function drawLines(canvas, bounds) {
         gl.useProgram(program);
 
         program.uColor = gl.getUniformLocation(program, "uColor");
-        gl.uniform4fv(program.uColor, [0.8, 0.2, 0.0, 0.8]);
+        gl.uniform4fv(program.uColor, [0.8 * alpha, 0.25 * alpha, 0.0, 0.8 * alpha]);
 
         program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
         gl.enableVertexAttribArray(program.aVertexPosition);

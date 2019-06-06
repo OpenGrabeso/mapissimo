@@ -27,6 +27,13 @@ function generateMapLayers(token){
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
+        {type: "mapboxoutdoors", name: "Mapbox Outdoors",
+            // NG style - cjh226q3j0rtd2roxwnwlwy13
+            style: "mapbox://styles/mapbox/outdoors-v10",
+            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
+            grid: true,
+        },
         {type: "routesold", name: "Tracks&Routes(Old)",
             url: "https://api.mapbox.com/styles/v1/ospanel/cjhbykqgr07cz2rph29u6h6yl/tiles/256/{z}/{x}/{y}?access_token=" + token,
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
