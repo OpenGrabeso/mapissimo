@@ -11,7 +11,7 @@
  */
 
 function generateMapLayers(token){
-	var osmAttr = '&copy; <a href="http://openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
+	var osmAttr = '&copy; <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';
 	var mtbMapAttr = osmAttr + ', Tiles courtesy of <a href="http://mtbmap.cz/" target="_blank">mtbmap.cz</a>';
 	var osmCzAttr = ', Tiles courtesy of <a href="https://openstreetmap.cz" target="_blank">openstreetmap.cz</a>';
     var stravaAttr = ', Heatmap courtesy of <a href="https://www.strava.com" target="_blank">Strava</a>';
@@ -49,7 +49,7 @@ function generateMapLayers(token){
                     opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", opacity: 0.6, transparency: 'true', attribution: stravaAttr}}
         },
 		{type: "openstreetmap", name: "OpenStreetMap",
-			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
 			opts: {maxZoom: 20, maxNativeZoom: 19, attribution: osmAttr}},
 		{type: "mtbmap", name: "mtbmap.cz",
 			url: "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
