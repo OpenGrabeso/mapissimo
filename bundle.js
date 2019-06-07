@@ -163,9 +163,9 @@ function createMapRender(map, name, dx, dy, pos, zoom, cache) {
             scrollWheelZoom: false,
             exportControl: false
         });
+        renderMap.setView(pos, zoom);
         var layer = tileLayer(layerDef);
         layer.addTo(renderMap);
-        renderMap.setView(pos, zoom);
         cacheRenderMap = renderMap;
         cacheMapContainer = mapContainer;
         cacheRenderMapWidth = dx;
@@ -247,6 +247,18 @@ function displayCanvas(canvas, xs, ys, bounds) {
     mapDiv.innerHTML = '';
 }
 
+function fixLongitude(lng) {
+    while (lng > 180) lng -= 360;
+    while (lng < -180) lng += 360;
+    return lng;
+}
+function fixPos(pos) {
+    return {
+        lat: pos.lat,
+        lng: fixLongitude(pos.lng)
+    };
+}
+
 function saveFun(map) {
     // different handling needed for Mapbox GL
     var layerDef = selectedLayerDef(map);
@@ -258,7 +270,7 @@ function saveFun(map) {
     if (dim) {
         var d = dim();
         if (layerDef.style) {
-            renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+            renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, fixPos(map.getCenter()), map.getZoom());
             renderMap.once("idle", function() {
                 var canvas = renderMap.getCanvas();
                 var d = dim ? dim : currentMapDim;
@@ -268,7 +280,7 @@ function saveFun(map) {
             })
 
         } else {
-            renderMap = createMapRender(map, 'render-map', d.x, d.y, map.getCenter(), map.getZoom());
+            renderMap = createMapRender(map, 'render-map', d.x, d.y, fixPos(map.getCenter()), map.getZoom());
             var aMap = dim ? renderMap : map;
             leafletImage(aMap, function (err, canvas) {
                 var d = dim ? dim : currentMapDim;
@@ -320,14 +332,14 @@ function previewFun(map, dim) {
     var renderMap;
 
     if (layerDef.style) {
-        renderMap = createMapRenderGL(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
+        renderMap = createMapRenderGL(map, 'preview-map', dx, dy, fixPos(map.getCenter()), zoom, true);
         var renderedHandler = function() {
             var canvas = renderMap.getCanvas();
             previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
         };
         renderMap.once("idle", renderedHandler);
     } else {
-        renderMap = createMapRender(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
+        renderMap = createMapRender(map, 'preview-map', dx, dy, fixPos(map.getCenter()), zoom, true);
         leafletImage(renderMap, function (err, canvas) {
             // now you have canvas
             previewCanvas(canvas, dx / 2, dy / 2);
