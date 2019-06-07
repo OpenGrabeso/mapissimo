@@ -137,28 +137,47 @@ function createMapRenderContainer(name, dx, dy) {
     return mapContainer;
 }
 
-function createMapRender(map, name, dx, dy, pos, zoom) {
-    var mapContainer = createMapRenderContainer(name, dx, dy);
-    mapDiv.innerHTML = '';
-    mapDiv.appendChild(mapContainer);
-    var renderMap = L.map(mapContainer, {
-        preferCanvas: true,
-        attributionControl: false,
-        zoomControl: false,
-        scrollWheelZoom: false,
-        exportControl: false
-    });
-    var layerDef = selectedLayerDef(map);
-    var layer = tileLayer(layerDef);
-    layer.addTo(renderMap);
-    renderMap.setView(pos, zoom);
-    return renderMap;
-}
-
 var cacheRenderMapGL;
+
+var cacheRenderMap;
+var cacheRenderMapURL;
+
 var cacheMapContainer;
 var cacheRenderMapWidth;
 var cacheRenderMapHeight;
+
+function createMapRender(map, name, dx, dy, pos, zoom, cache) {
+    var layerDef = selectedLayerDef(map);
+    // TODO: find the layer and update it on URL change?
+    if (cache && !cacheRenderMap || cacheRenderMapWidth !== dx || cacheRenderMapHeight !== dy || cacheRenderMapURL !== layerDef.url) {
+        if (cacheRenderMap) {
+            cacheRenderMap.remove();
+        }
+        var mapContainer = createMapRenderContainer(name, dx, dy);
+        mapDiv.innerHTML = '';
+        mapDiv.appendChild(mapContainer);
+        var renderMap = L.map(mapContainer, {
+            preferCanvas: true,
+            attributionControl: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            exportControl: false
+        });
+        var layer = tileLayer(layerDef);
+        layer.addTo(renderMap);
+        renderMap.setView(pos, zoom);
+        cacheRenderMap = renderMap;
+        cacheMapContainer = mapContainer;
+        cacheRenderMapWidth = dx;
+        cacheRenderMapHeight = dy;
+        cacheRenderMapURL = layerDef.url;
+        return renderMap;
+    } else {
+        cacheRenderMap.setView(pos, zoom);
+        return cacheRenderMap;
+
+    }
+}
 
 function createMapRenderGL(map, name, dx, dy, pos, zoom, cache) {
     var layerDef = selectedLayerDef(map);
@@ -213,6 +232,7 @@ var previewDimFun;
 function currentMapDim() {
     return mymap.getSize();
 }
+
 
 function displayCanvas(canvas, xs, ys, bounds) {
     drawLines(canvas, bounds);
@@ -307,11 +327,10 @@ function previewFun(map, dim) {
         };
         renderMap.once("idle", renderedHandler);
     } else {
-        renderMap = createMapRender(map, 'preview-map', dx, dy, map.getCenter(), zoom);
+        renderMap = createMapRender(map, 'preview-map', dx, dy, map.getCenter(), zoom, true);
         leafletImage(renderMap, function (err, canvas) {
             // now you have canvas
             previewCanvas(canvas, dx / 2, dy / 2);
-            renderMap.remove();
         }, dim);
     }
 }
