@@ -52,15 +52,17 @@
     function tileLayer(l) {
         var r;
         if (l.style) {
-            r = L.mapboxGL({
-                accessToken: mapboxToken,
-                style: l.style
-            });
+            r = L.mapboxGL({accessToken: mapboxToken, style: l.style});
         } else {
             r = L.tileLayer(l.url, l.opts);
         }
         if (l.overlay) {
-            var o = L.tileLayer(l.overlay.url, l.overlay.opts);
+            var o;
+            if (l.overlay.style) {
+                o = L.mapboxGL({accessToken: mapboxToken, style: l.overlay.style});
+            } else {
+                o = L.tileLayer(l.overlay.url, l.overlay.opts);
+            }
             r = L.layerGroup([r, o, L.grid()]);
         } else {
             r = L.layerGroup([r, L.grid()]);

@@ -52,13 +52,16 @@ function generateMapLayers(token){
             opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 20, attribution: cuzkAttr},
             grid: true
         },
-        {type: "zmcrosm", name: "Základní mapy ČR (+OSM.cz)",
+        {type: "zmcrosm", name: "Základní mapy ČR (+Routes)",
             url: "http://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}",
-            opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 18, attribution: cuzkAttr},
+            opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 19, attribution: cuzkAttr},
             grid: true,
-            overlay:
-                {url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}}},
+            overlay: {
+                style: "mapbox://styles/ospanel/cjysnpihs01im1cqser992tha",
+                token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
+                opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr}
+            }
+        },
         {type: "mtbmap", name: "mtbmap.cz",
 			url: "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
 			opts: {minZoom: 3, maxZoom: 20, maxNativeZoom: 18, attribution: mtbMapAttr}},
