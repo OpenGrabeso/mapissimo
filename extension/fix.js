@@ -15,16 +15,17 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 	function tileLayer(l) {
         var r;
         if (l.style) {
-            r = L.mapboxGL({
-                accessToken: l.token,
-                style: l.style
-            });
+            r = L.mapboxGL({accessToken: l.token, style: l.style});
         } else {
             r = L.tileLayer(l.url, l.opts);
         }
         if (l.overlay) {
-
-            var o = L.tileLayer(l.overlay.url, l.overlay.opts);
+            var o;
+            if (l.overlay.style) {
+                o = L.mapboxGL({accessToken: l.overlay.token, style: l.overlay.style});
+            } else {
+                o = L.tileLayer(l.overlay.url, l.overlay.opts);
+            }
             if (l.grid) {
                 r = L.layerGroup([r, o, L.grid()]);
             } else {
