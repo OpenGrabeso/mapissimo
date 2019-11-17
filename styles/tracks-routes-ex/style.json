@@ -12,7 +12,7 @@
                 "collapsed": false
             },
             "1444934749452.0452": {"name": "Wetlands", "collapsed": true},
-            "1444855786460.0557": {"name": "Roads", "collapsed": true},
+            "1444855786460.0557": {"name": "Roads", "collapsed": false},
             "1444933575858.6992": {
                 "name": "Highway shields",
                 "collapsed": true
@@ -71,7 +71,7 @@
     "pitch": 0,
     "sources": {
         "composite": {
-            "url": "mapbox://mapbox.mapbox-streets-v7,ospanel.1s6d588v,ospanel.9hxc55p3,ospanel.dbseq8xb,ospanel.8x60jyoi,mapbox.mapbox-terrain-v2",
+            "url": "mapbox://mapbox.mapbox-streets-v7,mapbox.mapbox-streets-v8,ospanel.1s6d588v,ospanel.9hxc55p3,ospanel.dbseq8xb,ospanel.8x60jyoi,mapbox.mapbox-terrain-v2",
             "type": "vector"
         }
     },
@@ -82,7 +82,17 @@
             "id": "background",
             "type": "background",
             "layout": {},
-            "paint": {"background-color": "#cccccc"}
+            "paint": {
+                "background-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    14.8,
+                    "#cccccc",
+                    15,
+                    "#e0e0e0"
+                ]
+            }
         },
         {
             "id": "landcover_crop",
@@ -250,7 +260,7 @@
             "id": "national_park",
             "type": "fill",
             "source": "composite",
-            "source-layer": "landuse_overlay",
+            "source-layer": "landuse",
             "filter": [
                 "all",
                 [
@@ -1365,23 +1375,23 @@
             ],
             "layout": {},
             "paint": {
-                "line-color": "hsl(35, 6%, 79%)",
+                "line-color": "#606060",
                 "line-width": [
                     "interpolate",
                     ["exponential", 1.5],
                     ["zoom"],
                     15,
-                    0.75,
-                    20,
-                    3
+                    3,
+                    18,
+                    10
                 ],
                 "line-opacity": [
                     "interpolate",
                     ["exponential", 1],
                     ["zoom"],
-                    15.5,
+                    14.5,
                     0,
-                    16,
+                    15,
                     1
                 ]
             }
@@ -1408,19 +1418,7 @@
                 ]
             ],
             "layout": {},
-            "paint": {
-                "fill-color": "hsl(35, 8%, 56%)",
-                "fill-opacity": [
-                    "interpolate",
-                    ["exponential", 1],
-                    ["zoom"],
-                    11,
-                    0,
-                    16,
-                    1
-                ],
-                "fill-outline-color": "hsl(35, 6%, 79%)"
-            }
+            "paint": {"fill-color": "#989086", "fill-outline-color": "#989086"}
         },
         {
             "id": "tunnel-street-low",
@@ -2919,7 +2917,7 @@
                     18,
                     8
                 ],
-                "line-color": "hsl(50, 100%, 40%)",
+                "line-color": "hsl(21, 100%, 40%)",
                 "line-blur": [
                     "interpolate",
                     ["exponential", 1],
@@ -2936,7 +2934,7 @@
                     13,
                     0,
                     13.25,
-                    0.25
+                    0.7
                 ]
             }
         },
@@ -2967,7 +2965,7 @@
                     18,
                     14.5
                 ],
-                "line-color": "hsl(230, 24%, 87%)",
+                "line-color": "hsl(230, 24%, 30%)",
                 "line-gap-width": 0,
                 "line-opacity": [
                     "interpolate",
@@ -3836,13 +3834,65 @@
                 "line-dasharray": [
                     "step",
                     ["zoom"],
-                    ["literal", [4, 0.4]],
+                    ["literal", [1, 0]],
                     15,
-                    ["literal", [1.75, 0.4]],
+                    ["literal", [1.5, 0.4]],
                     16,
-                    ["literal", [0.75, 0.4]],
-                    17,
-                    ["literal", [0.3, 0.3]]
+                    ["literal", [1, 0.2]]
+                ],
+                "line-opacity": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    13,
+                    0,
+                    13.25,
+                    1
+                ]
+            }
+        },
+        {
+            "id": "road-steps-case",
+            "type": "line",
+            "metadata": {"mapbox:group": "1444855786460.0557"},
+            "source": "composite",
+            "source-layer": "road",
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["LineString"], true, false],
+                [
+                    "all",
+                    [
+                        "match",
+                        ["get", "structure"],
+                        ["bridge", "tunnel"],
+                        false,
+                        true
+                    ],
+                    ["match", ["get", "type"], ["steps"], true, false]
+                ]
+            ],
+            "layout": {"line-join": "round"},
+            "paint": {
+                "line-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    16,
+                    0.6,
+                    18,
+                    1.5
+                ],
+                "line-gap-width": [
+                    "interpolate",
+                    ["exponential", 1.5],
+                    ["zoom"],
+                    15,
+                    2,
+                    16,
+                    3,
+                    18,
+                    6
                 ],
                 "line-opacity": [
                     "interpolate",
@@ -5070,7 +5120,7 @@
             "type": "line",
             "metadata": {"mapbox:group": "de7356896d701960225c3cce294b3bae"},
             "source": "composite",
-            "source-layer": "barrier_line",
+            "source-layer": "structure",
             "minzoom": 13,
             "filter": [
                 "all",
@@ -5102,7 +5152,7 @@
             "type": "line",
             "metadata": {"mapbox:group": "de7356896d701960225c3cce294b3bae"},
             "source": "composite",
-            "source-layer": "barrier_line",
+            "source-layer": "structure",
             "minzoom": 13,
             "filter": [
                 "all",
@@ -8125,7 +8175,7 @@
             },
             "paint": {
                 "text-color": "#280606",
-                "text-halo-color": "#ffffff",
+                "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
                 "text-halo-width": 2,
                 "text-halo-blur": 2
             }
@@ -8369,9 +8419,52 @@
                     ["exponential", 1],
                     ["zoom"],
                     13,
-                    12,
+                    14,
                     15,
-                    16
+                    18
+                ]
+            },
+            "paint": {
+                "text-halo-width": 0.5,
+                "text-halo-color": "hsl(196, 80%, 70%)",
+                "text-color": "hsl(230, 48%, 44%)",
+                "text-halo-blur": 0.5
+            }
+        },
+        {
+            "id": "waterway-small-label",
+            "type": "symbol",
+            "source": "composite",
+            "source-layer": "waterway_label",
+            "minzoom": 12,
+            "filter": [
+                "all",
+                [
+                    "match",
+                    ["geometry-type"],
+                    ["Polygon", "LineString", "Point"],
+                    true,
+                    false
+                ],
+                ["match", ["get", "class"], ["stream"], true, false]
+            ],
+            "layout": {
+                "text-field": ["to-string", ["get", "name_en"]],
+                "text-font": [
+                    "DIN Offc Pro Italic",
+                    "Arial Unicode MS Regular"
+                ],
+                "symbol-placement": "line",
+                "text-pitch-alignment": "viewport",
+                "text-max-angle": 30,
+                "text-size": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    13,
+                    10,
+                    14,
+                    14
                 ]
             },
             "paint": {
@@ -10201,54 +10294,22 @@
             "id": "mountain-peak-label",
             "type": "symbol",
             "source": "composite",
-            "source-layer": "mountain_peak_label",
+            "source-layer": "natural_label",
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["Point"], true, false],
+                ["==", ["get", "elevation_m"], 0],
+                ["match", ["get", "class"], ["landform"], true, false]
+            ],
             "layout": {
-                "text-line-height": 1.1,
-                "text-size": [
-                    "interpolate",
-                    ["exponential", 1],
-                    ["zoom"],
-                    10,
-                    11,
-                    18,
-                    14
-                ],
-                "icon-image": "triangle-stroked-15",
+                "text-field": ["get", "name"],
                 "text-font": [
                     "DIN Offc Pro Medium",
                     "Arial Unicode MS Regular"
                 ],
-                "text-offset": [0, 0.65],
+                "icon-image": "triangle-stroked-15",
                 "text-anchor": "top",
-                "text-field": ["to-string", ["get", "name_en"]],
-                "text-letter-spacing": 0.01,
-                "text-max-width": 8
-            },
-            "paint": {
-                "text-color": "hsl(45, 100%, 16%)",
-                "text-halo-color": "hsl(0, 0%, 100%)",
-                "text-halo-width": 0.5,
-                "text-halo-blur": 0.5
-            }
-        },
-        {
-            "id": "mountain-peak-label-with-elevation",
-            "type": "symbol",
-            "source": "composite",
-            "source-layer": "mountain_peak_label",
-            "filter": [
-                "all",
-                [
-                    "match",
-                    ["geometry-type"],
-                    ["Polygon", "LineString", "Point"],
-                    true,
-                    false
-                ],
-                [">", ["get", "elevation_m"], 0]
-            ],
-            "layout": {
-                "text-line-height": 1.1,
+                "text-offset": [0, 0.65],
                 "text-size": [
                     "interpolate",
                     ["exponential", 1],
@@ -10258,14 +10319,27 @@
                     14,
                     20
                 ],
-                "icon-image": "triangle-stroked-15",
-                "text-font": [
-                    "DIN Offc Pro Medium",
-                    "Arial Unicode MS Regular"
-                ],
-                "text-offset": [0, 0.65],
-                "icon-size": 1,
-                "text-anchor": "top",
+                "text-letter-spacing": 0.01
+            },
+            "paint": {
+                "text-color": "#523d00",
+                "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+                "text-halo-width": 2.5,
+                "text-halo-blur": 2
+            }
+        },
+        {
+            "id": "mountain-peak-label-with-elevation copy",
+            "type": "symbol",
+            "source": "composite",
+            "source-layer": "natural_label",
+            "filter": [
+                "all",
+                ["match", ["geometry-type"], ["Point"], true, false],
+                [">", ["get", "elevation_m"], 0],
+                ["match", ["get", "class"], ["landform"], true, false]
+            ],
+            "layout": {
                 "text-field": [
                     "concat",
                     ["get", "name"],
@@ -10273,14 +10347,29 @@
                     ["get", "elevation_m"],
                     "m"
                 ],
-                "text-letter-spacing": 0.01,
-                "text-max-width": 8
+                "text-font": [
+                    "DIN Offc Pro Medium",
+                    "Arial Unicode MS Regular"
+                ],
+                "icon-image": "triangle-stroked-15",
+                "text-anchor": "top",
+                "text-offset": [0, 0.65],
+                "text-size": [
+                    "interpolate",
+                    ["exponential", 1],
+                    ["zoom"],
+                    4,
+                    ["case", ["<=", ["get", "filterrank"], 1], 14, 12],
+                    14,
+                    ["case", ["<=", ["get", "filterrank"], 1], 22, 18]
+                ],
+                "text-letter-spacing": 0.01
             },
             "paint": {
-                "text-color": "rgb(80, 60, 0)",
+                "text-color": "#523d00",
                 "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
                 "text-halo-width": 2.5,
-                "text-halo-blur": 0.5
+                "text-halo-blur": 2
             }
         },
         {
@@ -11517,7 +11606,7 @@
     ],
     "created": "2018-08-01T18:03:15.759Z",
     "id": "cjkbfwccz11972rmt4xvmvme6",
-    "modified": "2019-07-31T13:03:35.813Z",
+    "modified": "2019-10-31T12:24:38.926Z",
     "owner": "ospanel",
     "visibility": "public",
     "draft": false
