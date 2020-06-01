@@ -37,26 +37,6 @@ function generateMapLayers(token){
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        routesheat: {
-            name: "Tracks&Routes+Heatmap",
-            style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
-            token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
-            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
-            grid: true,
-            overlay:
-                {
-                    url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
-                    opts: {
-                        minZoom: 2,
-                        maxZoom: 20,
-                        maxNativeZoom: 12,
-                        subdomains: "abc",
-                        opacity: 0.6,
-                        transparency: 'true',
-                        attribution: stravaAttr
-                    }
-                }
-        },
         openstreetmap: {
             name: "OpenStreetMap",
             url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

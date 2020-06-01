@@ -14,7 +14,8 @@
     {
       "matches": ["https://www.strava.com/routes/*", "https://www.strava.com/location/*"],
       "css": [
-        "mapbox-gl.css"
+        "mapbox-gl.css",
+        "inject.css"
       ],
       "js": [
         "arrive.min.js",
@@ -25,7 +26,8 @@
       "matches": ["https://www.strava.com/*"],
       "exclude_matches": ["*://*/*routes*"],
       "css": [
-        "mapbox-gl.css"
+        "mapbox-gl.css",
+        "inject.css"
       ],
       "js": [
         "arrive.min.js",
