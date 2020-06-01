@@ -36,10 +36,9 @@
     function buildBaseMaps() {
         var baseMaps = {};
         var layers = mapLayers;
-        for (var i = 0; i < layers.length; i++ ) {
-            var layer = layers[i];
-            baseMaps[layer.name] = tileLayer(layer);
-        }
+        Object.entries(mapLayers).forEach(
+            ([type, l]) => baseMaps[l.name] = tileLayer(l)
+        )
         return baseMaps;
     }
 
@@ -74,7 +73,8 @@
         var baseMaps = buildBaseMaps();
 
         L.control.layers(baseMaps).addTo(mymap);
-        baseMaps[mapLayers[0].name].addTo(mymap);
+        var firstLayer = baseMaps[Object.keys(baseMaps)[0]];
+        firstLayer.addTo(mymap);
         var geocoderOptions = {
             defaultMarkGeocode: false
         };
