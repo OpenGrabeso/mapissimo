@@ -20,39 +20,56 @@ function generateMapLayers(token){
 	var openTopoAttr = osmAttr + ', Tiles courtesy of <a href="https://opentopomap.org" target="_blank">OpenTopoMap.org</a>';
     var mapboxAttr = osmAttr + ', Tiles courtesy of <a href="https://www.mapbox.com" target="_blank">Mapbox.com</a>';
     var cuzkAttr = '&copy; <a href="http://geoportal.cuzk.cz" target="_blank">ČÚZK</a>';
-    return [
-        {type: "routes", name: "Tracks&Routes",
+    return {
+        routes: {
+            name: "Tracks&Routes",
             // NG style - cjh226q3j0rtd2roxwnwlwy13
             style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
             token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        {type: "mapboxoutdoors", name: "Mapbox Outdoors",
+        mapboxoutdoors: {
+            name: "Mapbox Outdoors",
             // NG style - cjh226q3j0rtd2roxwnwlwy13
             style: "mapbox://styles/mapbox/outdoors-v10",
             token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
-        {type: "routesheat", name: "Tracks&Routes+Heatmap",
+        routesheat: {
+            name: "Tracks&Routes+Heatmap",
             style: "mapbox://styles/ospanel/cjkbfwccz11972rmt4xvmvme6",
             token: "pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
             overlay:
-                {url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 12, subdomains: "abc", opacity: 0.6, transparency: 'true', attribution: stravaAttr}}
+                {
+                    url: "https://heatmap-external-{s}.strava.com/tiles/run/bluered/{z}/{x}/{y}.png?px=256",
+                    opts: {
+                        minZoom: 2,
+                        maxZoom: 20,
+                        maxNativeZoom: 12,
+                        subdomains: "abc",
+                        opacity: 0.6,
+                        transparency: 'true',
+                        attribution: stravaAttr
+                    }
+                }
         },
-		{type: "openstreetmap", name: "OpenStreetMap",
-			url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-			opts: {maxZoom: 20, maxNativeZoom: 19, attribution: osmAttr}},
-        {type: "zmcr", name: "Základní mapy ČR",
+        openstreetmap: {
+            name: "OpenStreetMap",
+            url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            opts: {maxZoom: 20, maxNativeZoom: 19, attribution: osmAttr}
+        },
+        zmcr: {
+            name: "Základní mapy ČR",
             url: "https://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}",
             opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 20, attribution: cuzkAttr},
             grid: true
         },
-        {type: "zmcrosm", name: "Základní mapy ČR (+Routes)",
+        zmcrosm: {
+            name: "Základní mapy ČR (+Routes)",
             url: "https://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}",
             opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 19, attribution: cuzkAttr},
             grid: true,
@@ -62,29 +79,43 @@ function generateMapLayers(token){
                 opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr}
             }
         },
-        {type: "mtbmap", name: "mtbmap.cz",
-			url: "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
-			opts: {minZoom: 3, maxZoom: 20, maxNativeZoom: 18, attribution: mtbMapAttr}},
-		{type: "mapycz", name: "mapy.cz",
-			url: "https://mapserver.mapy.cz/turist-m/{z}-{x}-{y}",
-			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}},
-        {type: "mapyczwinter", name: "mapy.cz - Winter",
+        mtbmap: {
+            name: "mtbmap.cz",
+            url: "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
+            opts: {minZoom: 3, maxZoom: 20, maxNativeZoom: 18, attribution: mtbMapAttr}
+        },
+        mapycz: {
+            name: "mapy.cz",
+            url: "https://mapserver.mapy.cz/turist-m/{z}-{x}-{y}",
+            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}
+        },
+        mapyczwinter: {
+            name: "mapy.cz - Winter",
             url: "https://mapserver.mapy.cz/winter-m/{z}-{x}-{y}",
-            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}},
-		{type: "mapyczbing", name: "mapy.cz Aerial",
-			url: "https://m{s}.mapserver.mapy.cz/bing/{z}-{x}-{y}",
-			opts: {minZoom: 2, maxZoom: 20, subdomains: "1234", attribution: mapyCzAttr},
-			overlay:
-				{url: "https://m{s}.mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
-					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzAttr}}},
-		{type: "opentopocz", name: "OpenTopo (+OSM.cz)",
-			url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-			opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
+            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}
+        },
+        mapyczbing: {
+            name: "mapy.cz Aerial",
+            url: "https://mapserver.mapy.cz/bing/{z}-{x}-{y}",
+            opts: {minZoom: 2, maxZoom: 20, subdomains: "1234", attribution: mapyCzAttr},
+            overlay:
+                {
+                    url: "https://mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
+                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzAttr}
+                }
+        },
+        opentopocz: {
+            name: "OpenTopo (+OSM.cz)",
+            url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 15, attribution: openTopoAttr},
             grid: true,
-			overlay:
-				{url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
-					opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}}},
-	];
+            overlay:
+                {
+                    url: "https://tile.poloha.net/kct/{z}/{x}/{y}.png",
+                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: osmCzAttr}
+                }
+        },
+    };
 };
 
 var AdditionalMapLayers = generateMapLayers("pk.eyJ1Ijoic3RyYXZhIiwiYSI6IlpoeXU2U0UifQ.c7yhlZevNRFCqHYm6G6Cyg"); // Strava mapbox access token

@@ -1,19 +1,29 @@
 {
   "name": "Mapissimo",
-  "version": "0.11.1",
+  "version": "0.12.1",
   "manifest_version": 2,
   "description": "Map switcher for Strava website",
   "homepage_url": "https://github.com/OpenGrabeso/mapissimo",
   "icons": { 
-			"128": "icon128.png" },
-		  "permissions": [
+			"128": "icon128.png"
+  },
+  "permissions": [
     "https://www.strava.com/*"
   ],
   "content_scripts": [
     {
-      "matches": [
-        "https://www.strava.com/*"
+      "matches": ["https://www.strava.com/routes/*", "https://www.strava.com/location/*"],
+      "css": [
+        "mapbox-gl.css"
       ],
+      "js": [
+        "arrive.min.js",
+        "inject-gl.js"
+      ]
+    },
+    {
+      "matches": ["https://www.strava.com/*"],
+      "exclude_matches": ["*://*/*routes*"],
       "css": [
         "mapbox-gl.css"
       ],
@@ -24,10 +34,15 @@
     }
   ],
   "web_accessible_resources": [
+    "arrive.min.js",
+    "donation.js",
     "mapbox-gl.js",
     "leaflet-mapbox-gl.js",
     "fix.js",
+    "fix-mapbox.js",
     "leaflet.grid.js",
-    "layers.js"
+    "layers.js",
+    "load.js",
+    "load-gl.js"
   ]
 }

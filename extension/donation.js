@@ -10,11 +10,29 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-{
-	localStorage.stravaMapSwitcherVersion = chrome.runtime.getManifest().version;
+var MapSwitcherDonation = null;
 
-	const s = document.createElement("script");
-	s.src = chrome.runtime.getURL("load.js");
-	s.type = 'text/javascript';
-	document.body.appendChild(s);
+{
+	const lastDonationClick = localStorage.stravaMapSwitcherLastDonationClick;
+	const clickedRecently = lastDonationClick && (Date.now() - lastDonationClick) < 1000 * 86400 * 180;
+
+	const lastDonationVersion = localStorage.stravaMapSwitcherLastDonationVersion;
+	const thisVersion = localStorage.stravaMapSwitcherVersion;
+	const clickedThisVersion = !thisVersion || (lastDonationVersion && thisVersion == lastDonationVersion);
+
+	if (!clickedRecently || !clickedThisVersion) {
+		MapSwitcherDonation =
+			jQuery('<a href="https://www.paypal.me/lisknisi/10EUR" target="_blank">')
+			.text('♥=€ strava-map-switcher')
+			.css({'font-weight': 'bold'})
+			.click(function () {
+				localStorage.stravaMapSwitcherLastDonationClick = Date.now();
+				localStorage.stravaMapSwitcherLastDonationVersion = thisVersion;
+			});
+	} else {
+		MapSwitcherDonation =
+			jQuery('<a href="https://github.com/liskin/strava-map-switcher#readme" target="_blank">')
+			.text('strava-map-switcher')
+			.css({'font-weight': 'bold'});
+	}
 }

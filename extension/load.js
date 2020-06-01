@@ -11,10 +11,34 @@
  */
 
 {
-	localStorage.stravaMapSwitcherVersion = chrome.runtime.getManifest().version;
+	const baseUrl = document.currentScript.src.match("^[a-z-]+://.*/") + "";
+	const getURL = (path) => baseUrl + path;
 
-	const s = document.createElement("script");
-	s.src = chrome.runtime.getURL("load.js");
-	s.type = 'text/javascript';
-	document.body.appendChild(s);
+	const ignoreError = (promise) => new Promise(resolve => { promise.then(resolve, resolve); null; });
+
+	const getScript = (url) => new Promise(function (resolve, reject) {
+		const s = document.createElement("script");
+		s.src = url;
+		s.async = false;
+		s.type = 'text/javascript';
+		s.onerror = reject;
+		s.onload = resolve;
+		document.body.appendChild(s);
+	});
+
+	Promise.resolve(window.jQuery ? null
+		: getScript("https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js").then(() => jQuery.noConflict())
+	).then(function () {
+        getScript(getURL('mapbox-gl.js'));
+    }).then(function () {
+        getScript(getURL('leaflet-mapbox-gl.js'));
+        getScript(getURL('leaflet.grid.js'));
+    }).then(() => Promise.all([
+		getScript(getURL('arrive.min.js')),
+		getScript(getURL('layers.js')),
+		getScript(getURL('donation.js')),
+	])).then(function () {
+		getScript(getURL('fix.js'));
+		getScript(getURL('fix-mapbox.js'));
+	});
 }

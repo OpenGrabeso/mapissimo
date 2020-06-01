@@ -10,13 +10,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var FixScript = document.currentScript;
-jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
+document.arrive(".leaflet-container", {onceOnly: false, existing: true}, function () {
 	function tileLayer(l) {
         var r;
         if (l.style) {
+            console.log("Create tileLayer style " + l.style);
             r = L.mapboxGL({accessToken: l.token, style: l.style});
         } else {
+            console.log("Create tileLayer url " + l.url);
             r = L.tileLayer(l.url, l.opts);
         }
         if (l.overlay) {
@@ -38,7 +39,7 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 	}
 
 	function addLayers(map) {
-		AdditionalMapLayers.forEach(l => map.layers[l.type] = tileLayer(l));
+        Object.entries(AdditionalMapLayers).forEach(([type, l]) => map.layers[type] = tileLayer(l));
 	}
 
 	var layerNames =
@@ -46,22 +47,19 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 		,standard: Strava.I18n.Locale.t("strava.maps.google.custom_control.standard")
 		,satellite: Strava.I18n.Locale.t("strava.maps.google.custom_control.satellite")
 		};
-	AdditionalMapLayers.forEach(l => layerNames[l.type] = l.name);
+    Object.entries(AdditionalMapLayers).forEach(([type, l]) => {
+        console.log("AdditionalMapLayers " + l.name)
+        layerNames[type] = l.name
+    });
 
 	var activityOpts = jQuery('#map-type-control .options');
 	if (activityOpts.length) {
-		Strava.Maps.CustomControlView.prototype.handleMapTypeSelector = function(t) {
-			var e, i, r;
-			return(
-				e = this.$$(t.target),
-				r = e.data("map-type-id"),
-				i = this.$("#selected-map").data("map-type-id"),
-				e.data("map-type-id", i),
-				e.text(layerNames[i]),
-				this.$("#selected-map").data("map-type-id", r),
-				this.$("#selected-map").text(layerNames[r]),
-				this.changeMapType(r)
-			);
+		Strava.Maps.CustomControlView.prototype.handleMapTypeSelector = function (t) {
+			const type = this.$$(t.target).data("map-type-id");
+			const selected = this.$("#selected-map");
+			selected.data("map-type-id", type);
+			selected.text(layerNames[type]);
+			return this.changeMapType(type);
 		};
 
 		var once = true;
@@ -77,13 +75,23 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 				this.delegateEvents();
 			}
 
+            console.log("changeMapType " + t)
 			localStorage.stravaMapSwitcherPreferred = t;
 			return map.setLayer(t);
 		};
 
-		var optsToAdd = [];
-		AdditionalMapLayers.forEach(l => optsToAdd.push({type: l.type, name: l.name}));
-		optsToAdd.forEach(o => activityOpts.append(jQuery('<li>').append(jQuery('<a class="map-type-selector">').data("map-type-id", o.type).text(o.name))));
+		function button(t) {
+		    console.log("button " + t + ":" + layerNames[t])
+			return jQuery('<li>')
+				.append(jQuery('<a class="map-type-selector">')
+				.data("map-type-id", t)
+				.text(layerNames[t]));
+		}
+
+		activityOpts.css({"max-height": "250px", "right": 0});
+		activityOpts.prepend(button("standard"));
+
+		Object.keys(AdditionalMapLayers).forEach(t => activityOpts.append(button(t)));
 
 		var preferredMap = localStorage.stravaMapSwitcherPreferred;
 
@@ -112,7 +120,8 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 			addLayers(e.map);
 
 			function setMapType(t) {
-				localStorage.stravaMapSwitcherSegmentExplorerPreferred = t;
+                console.log("mapbox: explorerMapFilters " + t)
+				localStorage.stravaMapSwitcherPreferred = t;
 				e.map.setLayer(t);
 			}
 
@@ -122,6 +131,7 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 			clr.css({clear: 'both', "margin-bottom": '1em'});
 			nav.append(clr);
 			function addButton(name, type) {
+			    console.log("addButton " + name + ":" + type);
 				var b = jQuery("<div class='button btn-xs'>").text(name);
 				b.click(() => { setMapType(type); });
 				clr.append(b);
@@ -129,7 +139,10 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 			addButton("Standard", "standard");
 			addButton("Terrain", "terrain");
 			addButton("Satellite", "satellite");
-			AdditionalMapLayers.forEach(l => addButton(l.name, l.type));
+			Object.entries(AdditionalMapLayers).forEach(([type, l]) => addButton(l.name, type));
+
+			if (MapSwitcherDonation)
+				clr.append(jQuery("<div class='button btn-xs'>").append(MapSwitcherDonation));
 
 			var preferredMap = localStorage.stravaMapSwitcherPreferred;
 			if (preferredMap) {
@@ -144,39 +157,5 @@ jQuery.getScript(FixScript.dataset.layersUrl).done(function(){
 			Strava.Explorer.Navigation.prototype.navigate = old_navigate;
 		};
 		explorerMapFilters.trigger('submit');
-	}
-
-	var routeBuilderOpts = jQuery('#view-options li.map-style div.switches');
-	if (routeBuilderOpts.length) {
-		var once = true;
-		Strava.Routes.MapViewOptionsView.prototype.setMapStyle = function(t){
-			var map = this.map;
-
-			if (once) {
-				once = false;
-
-				addLayers(map);
-			}
-
-			localStorage.stravaMapSwitcherPreferred = t;
-			return map.setLayer(t);
-		};
-
-		var preferredMap = localStorage.stravaMapSwitcherPreferred;
-
-		// change map so that our setMapStyle is called
-		routeBuilderOpts.find('div:last').click();
-
-		routeBuilderOpts.css({display: 'block', position: 'relative'});
-		AdditionalMapLayers.forEach(l =>
-			routeBuilderOpts.append(
-				jQuery("<div class='button btn-xs' tabindex='0'>").data("value", l.type).text(l.name)
-			)
-		);
-		routeBuilderOpts.children().css({display: 'block', width: '100%'});
-
-		if (preferredMap) {
-			routeBuilderOpts.children().filter((_, e) => jQuery(e).data("value") === preferredMap).click();
-		}
 	}
 });
