@@ -37,6 +37,7 @@ document.arrive(".mapboxgl-map", {onceOnly: false, existing: true}, function () 
 
         if (l.style) {
             // handle mapbox GL styled layer
+            map.setStyle(l.style);
         } else {
             if (l.overlay) {
                 const s = `${type}_overlay`;
