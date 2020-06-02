@@ -10,6 +10,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+function initMapFix(mapboxStyles) {
+
 document.arrive(".mapboxgl-map", {onceOnly: false, existing: true}, function () {
 	function tilesFromLeaflet(l) {
 		if (l.url.includes("{s}")) {
@@ -37,7 +39,9 @@ document.arrive(".mapboxgl-map", {onceOnly: false, existing: true}, function () 
 
         if (l.style) {
             // handle mapbox GL styled layer
-            map.setStyle(l.style);
+            if (mapboxStyles) {
+                map.setStyle(l.style);
+            }
         } else {
             if (l.overlay) {
                 const s = `${type}_overlay`;
@@ -97,7 +101,12 @@ document.arrive(".mapboxgl-map", {onceOnly: false, existing: true}, function () 
 		select.change(e => setMapType(e.target.value));
 		select.append(jQuery(`<option value="">`).text("---"));
 		Object.entries(AdditionalMapLayers).forEach(
-			([type, l]) => select.append(jQuery(`<option value="${type}" ${type == preferredMap ? "selected" : ""}>`).text(l.name)));
+			([type, l]) => {
+			    if (mapboxStyles || l.url) { // ignore mapbox styled maps unless supported
+                    select.append(jQuery(`<option value="${type}" ${type == preferredMap ? "selected" : ""}>`).text(l.name))
+                }
+			}
+        );
 		sidebar.append(jQuery('<div>').append(select));
 
 		if (MapSwitcherDonation)
@@ -187,3 +196,5 @@ document.arrive(".mapboxgl-map", {onceOnly: false, existing: true}, function () 
 		patchRouteBuilder(mapbox);
 	}
 });
+
+}

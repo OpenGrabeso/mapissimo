@@ -44,6 +44,6 @@
 		getScript(getURL('donation.js')),
 	])).then(function () {
         getScript(getURL('fix-mapbox.js'));
-        getScript(getURL('fix-mapbox-styles.js'));
+        getScript(getURL('fix-mapbox-nostyles.js'));
     })
 }
