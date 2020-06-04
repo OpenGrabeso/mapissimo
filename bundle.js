@@ -103,20 +103,19 @@ function createText(pos, getter, store) {
 }
 
 function selectedLayerDef(map) {
-    var layerDef = mapLayers[0];
+    var layerDef = mapLayers.routes;
     var found = false;
     map.eachLayer(function(l) {
         if (map.hasLayer(l)) {
             //try to find URL
             if (!found) {
-                for (var mi = 0; mi < mapLayers.length; mi++) {
+                Object.keys(mapLayers).forEach(mi => {
                     // TODO: check style properly
                     if (l._url && mapLayers[mi].url === l._url || l.options && l.options.style && mapLayers[mi].style === l.options.style) {
                         layerDef = mapLayers[mi];
                         found = true;
-                        break;
                     }
-                }
+                });
             }
         }
     });
