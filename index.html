@@ -15,6 +15,10 @@
 	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js'></script>
 	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css' rel='stylesheet' />
 
+	<script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.umd.js"></script>
+	<link href="https://cdn.maptiler.com/maptiler-sdk-js/v1.1.1/maptiler-sdk.css" rel="stylesheet" />
+	<script src="https://cdn.maptiler.com/leaflet-maptilersdk/v1.0.0/leaflet-maptilersdk.js"></script>
+
   <script src="lib/leaflet-mapbox-gl.js"></script>
 
   <script src="lib/Control.Geocoder.js"></script>
@@ -50,7 +54,10 @@
 
     function tileLayer(l) {
         var r;
-        if (l.style) {
+        if (l.mtStyle) {
+            r = L.maptilerLayer({apiKey: maptilerKey, style: l.mtStyle});
+        }
+        else if (l.style) {
             r = L.mapboxGL({accessToken: mapboxToken, style: l.style});
         } else {
             r = L.tileLayer(l.url, l.opts);

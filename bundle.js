@@ -6,6 +6,7 @@
 var leafletImage = require('leaflet-image');
 
 mapboxToken = "pk.eyJ1Ijoib3NwYW5lbCIsImEiOiJjamhhOG0yZ2EwOGJ3MzBxcDY3eXZ1dGprIn0.ZQVprI8zqlpnJCSZ67VtXg";
+maptilerKey = "ERvtrxcxNj4ebSr0PUqK";
 
 mapLayers = generateMapLayers(mapboxToken);
 
@@ -111,7 +112,11 @@ function selectedLayerDef(map) {
             if (!found) {
                 Object.keys(mapLayers).forEach(mi => {
                     // TODO: check style properly
-                    if (l._url && mapLayers[mi].url === l._url || l.options && l.options.style && mapLayers[mi].style === l.options.style) {
+                    if (
+                        l._url && mapLayers[mi].url === l._url ||
+                        l.options && l.options.style && mapLayers[mi].style === l.options.style ||
+                        l.options && l.options.style && mapLayers[mi].mtStyle === l.options.style
+                    ) {
                         layerDef = mapLayers[mi];
                         found = true;
                     }
@@ -215,6 +220,43 @@ function createMapRenderGL(map, name, dx, dy, pos, zoom, cache) {
     }
 }
 
+function createMapRenderTiler(map, name, dx, dy, pos, zoom, cache) {
+            var layerDef = selectedLayerDef(map);
+            var centerGL = [pos.lng, pos.lat];
+            if (cache && !cacheRenderMapGL || cacheRenderMapWidth !== dx || cacheRenderMapHeight !== dy) {
+                if (cacheRenderMapGL) {
+                    cacheRenderMapGL.remove();
+                }
+                var mapContainer = createMapRenderContainer(name, dx, dy);
+                mapDiv.innerHTML = '';
+                mapDiv.appendChild(mapContainer);
+                var renderMap = new maptilersdk.Map({
+                    container: mapContainer,
+                    center: centerGL,
+                    style: layerDef.mtStyle,
+                    fadeDuration: 0, // disable symbol transitions for faster response (idle otherwise takes quite long)
+                    bearing: 0,
+                    maxZoom: 24,
+                    zoom: zoom - 1,
+                    pitch: 0,
+                    interactive: false,
+                    attributionControl: false,
+                    preserveDrawingBuffer: true
+                });
+                cacheRenderMapGL = renderMap;
+                cacheMapContainer = mapContainer;
+                cacheRenderMapWidth = dx;
+                cacheRenderMapHeight = dy;
+                return renderMap;
+            } else {
+                sizeMapRenderContainer(cacheMapContainer, dx, dy);
+                cacheRenderMapGL.setStyle(layerDef.style);
+                cacheRenderMapGL.setCenter(centerGL);
+                cacheRenderMapGL.setZoom(zoom - 1);
+                return cacheRenderMapGL;
+            }
+        }
+
 function previewSize(d, zoom) {
     var dx = d.x;
     var dy = d.y;
@@ -268,7 +310,16 @@ function saveFun(map) {
     imageDiv.appendChild(spinner);
     if (dim) {
         var d = dim();
-        if (layerDef.style) {
+        if (layerDef.mtStyle) {
+            renderMap = createMapRenderTiler(map, 'render-map', d.x, d.y, fixPos(map.getCenter()), map.getZoom());
+            renderMap.once("idle", function() {
+                var canvas = renderMap.getCanvas();
+                var d = dim ? dim : currentMapDim;
+                var ps = previewSize(d(), map.getZoom());
+                displayCanvas(canvas, ps.dx / 2, ps.dy / 2, renderMap.getBounds());
+                renderMap.remove();
+            })
+        } else if (layerDef.style) {
             renderMap = createMapRenderGL(map, 'render-map', d.x, d.y, fixPos(map.getCenter()), map.getZoom());
             renderMap.once("idle", function() {
                 var canvas = renderMap.getCanvas();
@@ -330,7 +381,14 @@ function previewFun(map, dim) {
     var layerDef = selectedLayerDef(map);
     var renderMap;
 
-    if (layerDef.style) {
+    if (layerDef.mtStyle) {
+        renderMap = createMapRenderTiler(map, 'preview-map', dx, dy, fixPos(map.getCenter()), zoom, true);
+        var renderedHandler = function() {
+            var canvas = renderMap.getCanvas();
+            previewCanvas(renderMap.getCanvas(), dx / 2, dy / 2, renderMap.getBounds());
+        };
+        renderMap.once("idle", renderedHandler);
+    } else if (layerDef.style) {
         renderMap = createMapRenderGL(map, 'preview-map', dx, dy, fixPos(map.getCenter()), zoom, true);
         var renderedHandler = function() {
             var canvas = renderMap.getCanvas();
@@ -668,7 +726,7 @@ module.exports = function leafletImage(map, callback) {
     // tiles, paths, and then markers
     map.eachLayer(drawTileLayer);
     map.eachLayer(drawEsriDynamicLayer);
-    
+
     if (map._pathRoot) {
         layerQueue.defer(handlePathRoot, map._pathRoot);
     } else if (map._panes) {
@@ -688,11 +746,11 @@ module.exports = function leafletImage(map, callback) {
             layerQueue.defer(handleMarkerLayer, l);
         }
     }
-    
+
     function drawEsriDynamicLayer(l) {
         if (!L.esri) return;
-       
-        if (l instanceof L.esri.DynamicMapLayer) {                       
+
+        if (l instanceof L.esri.DynamicMapLayer) {
             layerQueue.defer(handleEsriDymamicLayer, l);
         }
     }
@@ -866,18 +924,18 @@ module.exports = function leafletImage(map, callback) {
 
         if (isBase64) im.onload();
     }
-    
+
     function handleEsriDymamicLayer(dynamicLayer, callback) {
         var canvas = document.createElement('canvas');
         canvas.width = dimensions.x;
         canvas.height = dimensions.y;
-    
+
         var ctx = canvas.getContext('2d');
-    
+
         var im = new Image();
         im.crossOrigin = '';
         im.src = addCacheString(dynamicLayer._currentImage._image.src);
-    
+
         im.onload = function() {
             ctx.drawImage(im, 0, 0);
             callback(null, {
