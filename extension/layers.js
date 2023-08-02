@@ -64,26 +64,6 @@ function generateMapLayers(token){
             url: "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png",
             opts: {minZoom: 3, maxZoom: 20, maxNativeZoom: 18, attribution: mtbMapAttr}
         },
-        mapycz: {
-            name: "mapy.cz",
-            url: "https://mapserver.mapy.cz/turist-m/{z}-{x}-{y}",
-            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}
-        },
-        mapyczwinter: {
-            name: "mapy.cz - Winter",
-            url: "https://mapserver.mapy.cz/winter-m/{z}-{x}-{y}",
-            opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, attribution: mapyCzAttr}
-        },
-        mapyczbing: {
-            name: "mapy.cz Aerial",
-            url: "https://mapserver.mapy.cz/bing/{z}-{x}-{y}",
-            opts: {minZoom: 2, maxZoom: 20, subdomains: "1234", attribution: mapyCzAttr},
-            overlay:
-                {
-                    url: "https://mapserver.mapy.cz/hybrid-trail_bike-m/{z}-{x}-{y}",
-                    opts: {minZoom: 2, maxZoom: 20, maxNativeZoom: 18, subdomains: "1234", attribution: mapyCzAttr}
-                }
-        },
         opentopocz: {
             name: "OpenTopo (+OSM.cz)",
             url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
