@@ -48,13 +48,13 @@ function generateMapLayers(token){
         },
         zmcr: {
             name: "Základní mapy ČR",
-            url: "https://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}",
+            url: "https://ags.cuzk.cz/arcgis1/rest/services/ZTM/MapServer/tile/{z}/{y}/{x}",
             opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 20, attribution: cuzkAttr},
             grid: true
         },
         zmcrosm: {
             name: "Základní mapy ČR (+Routes)",
-            url: "https://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}",
+            url: "https://ags.cuzk.cz/arcgis1/rest/services/ZTM/MapServer/tile/{z}/{y}/{x}",
             opts: {minZoom: 7, maxZoom: 20, maxNativeZoom: 19, attribution: cuzkAttr},
             grid: true,
             overlay: {
