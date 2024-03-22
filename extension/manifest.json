@@ -1,10 +1,10 @@
 {
   "name": "Mapissimo",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "manifest_version": 2,
   "description": "Map switcher for Strava website",
   "homepage_url": "https://github.com/OpenGrabeso/mapissimo",
-  "icons": { 
+  "icons": {
 			"128": "icon128.png"
   },
   "permissions": [
