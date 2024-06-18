@@ -16,8 +16,9 @@ var dpi = 200;
 var minDpi = 100;
 var maxDpi = 320;
 var dpiStep = 20;
-function a4width() {return 8 * dpi;}
-function a4height() {return 11 * dpi;}
+var border = 0.2;
+function a4width() {return (8.3 - 2 * border) * dpi;}
+function a4height() {return (11.7 - 2 * border) * dpi;}
 
 function setDPI(container) {
     container.value = "DPI: " + dpi.toString();
