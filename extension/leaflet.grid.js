@@ -10,8 +10,8 @@ L.Grid = L.LayerGroup.extend({
         lineStyle: {
             stroke: true,
             color: '#C33',
-            opacity: 0.6,
-            weight: 1.5
+            opacity: 0.5,
+            weight: 4.0
         },
 
         // Redraw on move or moveend
