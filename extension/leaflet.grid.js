@@ -20,6 +20,7 @@ L.Grid = L.LayerGroup.extend({
 
     _lineStyle: function(alpha) {
         var ret = jQuery.extend({}, this.options.lineStyle);
+        ret.weight = Math.max(ret.weight * alpha, 1);
         ret.opacity *= alpha;
         return ret;
     },
