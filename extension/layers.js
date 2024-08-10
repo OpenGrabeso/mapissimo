@@ -35,9 +35,9 @@ function generateMapLayers(token){
             grid: true,
         },
         maptiler: {
-            name: "MapTiler Outdoors",
-            mtStyle: "https://api.maptiler.com/maps/outdoor-v2/style.json",
-            token: "ERvtrxcxNj4ebSr0PUqK",
+            name: "MapTiler Tracks",
+            mtStyle: "https://api.maptiler.com/maps/0b03ac78-e776-49d8-8db7-14288e926106/style.json?key=nf47mQnHssJsgnTCtbsX",
+            token: "T5uQRh1Yd4J9fnVbv5tB",
             opts: {maxZoom: 20, maxNativeZoom: 19, attribution: mapboxAttr},
             grid: true,
         },
